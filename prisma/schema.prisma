@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URI")
+}
+
+model Label {
+  id        String   @id @default(uuid())
+  name      String
+  color     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Deal      Deal[]
+}
+
+model Note {
+  id        String    @id @default(uuid())
+  note      String
+  deals     Deal[]
+  contacts  Contact[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model File {
+  id        String    @id @default(uuid())
+  name      String
+  type      String
+  size      BigInt
+  url       String
+  deals     Deal[]
+  contacts  Contact[]
+  uploader  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Activity {
+  id                  String        @id @default(uuid())
+  name                String
+  type                ActivityTypes
+  start               DateTime
+  end                 DateTime
+  // Optional Fields
+  desc                String?
+  location            String?
+  taskLink            String?
+  googleEventId       String?
+  googleEventHtmlLink String?
+  icon                String
+  deals               Deal[]
+  contacts            Contact[]
+  performer           String
+  creator             String
+  completedOn         DateTime?
+  // Time Stamp
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model Contact {
+  id           String     @id @default(uuid())
+  company      String
+  contactPeron String
+  mobile       String
+  whatsapp     String
+  email        String
+  notes        Note[]
+  activities   Activity[]
+  files        File[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Deal {
+  id                  String     @id @default(uuid())
+  name                String
+  desc                String?
+  currency            String
+  status              STATUS
+  expectedClosingDate DateTime?
+  labelId             String
+  label               Label      @relation(fields: [labelId], references: [id])
+  currentStage        Stage      @relation(fields: [currentStageId], references: [id])
+  currentStageId      String
+  contacts            String
+  items               String
+  // Activities 
+  notes               Note[]
+  files               File[]
+  emails              String
+  activities          Activity[]
+  userId              String
+  creator             String
+  pipelineId          String
+  Pipeline            Pipeline   @relation(fields: [pipelineId], references: [id])
+
+  // Time Stamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stage {
+  id         String   @id @default(uuid())
+  name       String
+  desc       String?
+  position   Int      @default(1)
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id])
+  deals      Deal[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Pipeline {
+  id        String   @id @default(uuid())
+  name      String
+  desc      String?
+  stages    Stage[]
+  deals     Deal[]
+  assignees String[]
+  owner     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ROLES {
+  USER
+  EDITOR
+  ADMIN
+  SUPERUSER
+}
+
+enum ActivityTypes {
+  CALL
+  EMAIL
+  MEETING
+  TASK
+}
+
+enum STATUS {
+  OPEN
+  WON
+  LOST
+}

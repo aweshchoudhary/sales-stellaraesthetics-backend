@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sales-stellar-aesthetics",
+  "private_key_id": "ddfc97946ef8708d857fb9cca840fb5def979dc1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDKMNfQvWuvPnaT\nAwnmBciZY7qkT9gIgy1uhUXS4aHs8dmHt4q6pXxs2MMlMlal501hOFdONU+Cftix\nLFSm5dN2XmobzFqvgTAenrBfvvnKtXkpJPXYKX5k6SCqCKQAnvpz227y6yPipA4L\n722U7h/Jji5zIs+TcTeeWYT43jS4VFRxF9WNqF3ZrtkXiu+pSW5AU4OqYzLB6H8E\ntFvUFvEqW91jC/h38zK8ecqJsQqmG2uNMubEvj5KaGwWYiwDs2/RW326iv0odTTo\noiKjBs0nju7UUlIQIK46tvGIWcQZs9DDwtjv0zPw8UYHlhwNJDnS1x+58jnnKnFA\nQ6qGGv//AgMBAAECggEAIdrS0CdfaAz38r7AAg123MQ3pLqfzDEWwto66kgQgmmu\niEyBxKXf8yPKbSiEHKxhpwU1jSldAlc19libZgS2hyvg7X2ms5tYkM/2bVm/XqNL\nQcnoBkVQXhow93eR6m60NgEIj1EzBYh9t57kBNtoZCnT+kBabHA5JWEM5FTkk/Zy\noB6rIZExs7GhA7V+k4w9jsFt7pSRWEhmtNDauqmu3d/pNqrZnh6ZU/1GviS7XqyB\nhpYSuba9YQqo8nC/FBJ8zYc0WK6hrqPTRTRrzwrZxLuSUuFuWAgVZg2h1Bh6cnEI\nVNA0hCW43HzaI/r3k5R4lAOxE7ISH69wdtD33ZoECQKBgQDrGXKm58ICZ4YHZBBL\nLzyISgKVDqabdLapp0J0JP5lIRQGZJz7BEXvG+vJcgdZa5UqNi2fgKk/BgE3hitA\nZlQVHgCtDL/6B46y90R2RGip9y0WZxZ+AlniMjtuUZunHLR8U4dA9sS4wKHpDoL+\nE0zV/2CTWo35SghXlHWjya3riQKBgQDcKnBHLERR4jlRytfA1QOfYW5kYlvz4ski\nK6LiD7D9PRB6bEDEz1fA0d6fpjz6q5dK2CTYyPzcdy16aGYyLWRfeJPMimdOuzKh\nyT9ScvfvVqg0Qxt9PG+kSgNBMwazQHQVsufwqUcZrjkRw68U0Xg0SDHaqsmKBiKf\nJz1e/N0FRwKBgQCLHVfWo7UNryyEGxX5J05uZzz37t9vhbTA1xRfnbRbKyOqVMb/\nUhv/zUnMvgjTRPHTNJPymjOL84Ws0Vuuk96VUFeeDrlavjYWeHKuePRl/rlTVFTe\n441EZ+z67pdoX3f9SX/zVRI7MOGeAtRIfCsvRhpjl2YDaWdeS58A+EpN4QKBgQC5\nrZTpgXzQ7hBXWdHh0ARxGzOFt6pDIkVs6w5AxukGecR26uso0JD6jkTJseKFqcc7\nmNRifAc9S8lwDbH6qWuYVNGZVDRSIvBNn7Mmrs1I7XWINfxt/1VMYhsilo0VCcud\nLTgNMEZFcziwMa9ryEkvFp/tAdJc9FWokehhPrKMKwKBgQDQepWYaj7qp4C/A+GK\nP2VFTIv9FbHaWYEdYNL27CiWJMmIzbbl5YUk/uvihBs8EZYZvAM+3U55//eAV0Y/\nOi7BnIhr6/IY+HSQOXx6OCkNoa0ywPy/5YQl8EtTP/DG1KuopJuszJSpMHD+qPc9\nMtYjUo41hp1b7MQ/yZgXM59GGw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "sales-stellar-aesthetics-919@sales-stellar-aesthetics.iam.gserviceaccount.com",
+  "client_id": "113192693445822921729",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sales-stellar-aesthetics-919%40sales-stellar-aesthetics.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
