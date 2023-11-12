@@ -7,11 +7,12 @@ const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
+    const loggedUser: any = req.user;
     // Your logic for creating a resource on the server goes here
     await prisma.pipeline.create({
       data: {
         ...req.body,
-        // owner: req.oidc.user?.sub,
+        owner: loggedUser.uid,
       },
     });
 

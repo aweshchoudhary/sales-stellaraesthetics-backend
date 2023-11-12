@@ -7,6 +7,9 @@ import cors from "cors";
 import sessions from "express-session";
 import { config } from "dotenv";
 import api from "./api";
+import authenticate from "./api/middlewares/auth.middleware";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./api/auth/fireabase.login";
 
 // Load environment variables from .env file
 config();
@@ -49,9 +52,38 @@ if (app.get("env") === "production") {
 
 app.use(sessions(session));
 
+app.post("/auth", async (req, res) => {
+  const { email, password } = req.body;
+  await signInWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
+      const user1 = userCredential.user;
+      const token = await userCredential.user.getIdToken();
+      // console.log(user1);
+      res.json({ data: user1, token });
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode, errorMessage);
+      res.status(400).json({ error: errorMessage });
+    });
+
+  // admin
+  //   .auth()
+  //   .signInWithEmailAndPassword(email, password)
+  //   .then((userCredential) => {
+  //     // User is authenticated
+  //     const user = userCredential.user;
+  //     console.log(`User ${user.email} is authenticated`);
+  //   })
+  //   .catch((error) => {
+  //     // Authentication failed
+  //     console.error("Authentication failed:", error);
+  //   });
+});
 
 // Mount the API routes under /api/v1 path
-app.use("/api/v1", api);
+app.use("/api/v1", authenticate, api);
 // app.use("/api/v1", isAuthenticated, api);
 
 // Start the server

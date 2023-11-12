@@ -8,10 +8,11 @@ export async function checkPipelineOwnerAccess(
   res: Response,
   next: NextFunction
 ) {
+  const loggedUser: any = req.user;
   const pipeline = await prisma.pipeline.findUnique({
     where: {
       id: req.params.id ?? req.body.pipelineId,
-      // owner: req.oidc.user?.sub,
+      owner: loggedUser.uid,
     },
   });
 
@@ -28,10 +29,11 @@ export async function checkPipelineAssigneeAccess(
   res: Response,
   next: NextFunction
 ) {
+  const loggedUser: any = req.user;
   const pipeline = await prisma.pipeline.count({
     where: {
       id: req.params.id ?? req.body.pipelineId,
-      // assignees: { has: req.oidc.user?.sub },
+      assignees: { has: loggedUser.uid },
     },
   });
 
@@ -49,13 +51,11 @@ export async function checkPipelineAccess(
   res: Response,
   next: NextFunction
 ) {
+  const loggedUser: any = req.user;
   const pipeline = await prisma.pipeline.count({
     where: {
       id: req.params.id ?? req.body.pipelineId,
-      // OR: [
-      //   { owner: req.oidc.user?.sub },
-      //   { assignees: { has: req.oidc.user?.sub } },
-      // ],
+      OR: [{ owner: loggedUser.uid }, { assignees: { has: loggedUser.uid } }],
     },
   });
 
