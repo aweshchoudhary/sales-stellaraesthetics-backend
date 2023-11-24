@@ -7,7 +7,7 @@ import {
   reorderStages,
   updateOne,
 } from "./stage.handlers";
-import { checkPipelineAccess } from "../../middlewares/pipeline.middleware";
+import { checkPipelineAccess } from "../pipeline/pipeline.middleware";
 
 const app = Router();
 

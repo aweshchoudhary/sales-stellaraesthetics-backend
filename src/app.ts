@@ -7,9 +7,9 @@ import cors from "cors";
 import sessions from "express-session";
 import { config } from "dotenv";
 import api from "./api";
-import authenticate from "./api/middlewares/auth.middleware";
+import authenticate from "./api/modules/auth/auth.middleware";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./api/auth/fireabase.config";
+import { auth } from "./api/modules/auth/fireabase.config";
 
 // Load environment variables from .env file
 config();

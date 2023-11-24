@@ -6,7 +6,7 @@ import {
   getOne,
   updateOne,
 } from "./activity.handlers";
-import { verifyActivityAccess } from "../../middlewares/activity.middlewares";
+import { verifyActivityAccess } from "./activity.middlewares";
 
 const app = Router();
 

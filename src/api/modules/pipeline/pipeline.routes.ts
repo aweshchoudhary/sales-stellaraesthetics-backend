@@ -9,7 +9,7 @@ import {
   removeUserFromPipeline,
   updateOne,
 } from "./pipeline.handlers";
-import { checkPipelineOwnerAccess } from "../../middlewares/pipeline.middleware";
+import { checkPipelineOwnerAccess } from "./pipeline.middleware";
 
 const app = Router();
 

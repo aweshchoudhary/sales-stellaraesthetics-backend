@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import admin from "../auth/firebase";
+import admin from "./firebase";
 
 async function authenticate(req: Request, res: Response, next: NextFunction) {
   try {

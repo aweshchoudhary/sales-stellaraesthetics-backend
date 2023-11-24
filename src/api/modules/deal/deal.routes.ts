@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { create, deleteOne, getMany, getOne, updateOne } from "./deal.handlers";
-import { checkPipelineAccess } from "../../middlewares/pipeline.middleware";
+import { checkPipelineAccess } from "../pipeline/pipeline.middleware";
 
 const app = Router();
 
