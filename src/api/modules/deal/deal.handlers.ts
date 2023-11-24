@@ -7,19 +7,26 @@ const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    console.log(req.body);
-    const stage: any = await prisma.stage.findUnique({
+    const stage = await prisma.stage.findUnique({
       where: { id: req.body.currentStageId },
     });
 
+    if (!stage) {
+      return res.status(404).json({ error: "Stage not found" });
+    }
+
+    // Create a new deal and connect it to the current stage and pipeline
     const deal = await prisma.deal.create({
       data: { ...req.body, pipelineId: stage.pipelineId },
     });
 
+    // Update the current stage to connect to the newly created deal
     await prisma.stage.update({
       where: { id: req.body.currentStageId },
       data: { deals: { connect: { id: deal.id } } },
     });
+
+    // Update the pipeline to connect to the newly created deal
     await prisma.pipeline.update({
       where: { id: stage.pipelineId },
       data: { deals: { connect: { id: deal.id } } },

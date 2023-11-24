@@ -15,14 +15,22 @@ const app = Router();
 
 app.post("/", create);
 app.get("/", getMany);
-app.get("/:id", getOne);
-app.put("/:id", updateOne);
-app.delete("/:id", deleteOne);
+app.get("/:pipelineId", getOne);
+app.put("/:pipelineId", updateOne);
+app.delete("/:pipelineId", deleteOne);
 
-app.post("/assign-user/:id", checkPipelineOwnerAccess, assignUserToPipeline);
-app.post("/remove-user/:id", checkPipelineOwnerAccess, removeUserFromPipeline);
 app.post(
-  "/change-ownership/:id",
+  "/assign-user/:pipelineId",
+  checkPipelineOwnerAccess,
+  assignUserToPipeline
+);
+app.post(
+  "/remove-user/:pipelineId",
+  checkPipelineOwnerAccess,
+  removeUserFromPipeline
+);
+app.post(
+  "/change-ownership/:pipelinId",
   checkPipelineOwnerAccess,
   changeOwnershipOfPipeline
 );

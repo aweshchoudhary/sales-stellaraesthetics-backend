@@ -5,3 +5,5 @@ node_modules
 .env
 
 ./src/**/*.json
+src/api/utils/servicekey.json
+./src/api/utils/servicekey.json

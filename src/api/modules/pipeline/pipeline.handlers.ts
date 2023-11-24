@@ -46,7 +46,7 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     // Your logic for retrieving a single resource from the server goes here
     const pipeline = await prisma.pipeline.findUnique({
       where: {
-        id: req.params.id,
+        id: req.params.pipelineId,
       },
       ...config,
     });
@@ -74,7 +74,7 @@ export async function updateOne(
     // Your logic for updating a resource on the server goes here
     const pipeline = await prisma.pipeline.update({
       where: {
-        id: req.params.id,
+        id: req.params.pipelineId,
       },
       data: req.body,
     });
@@ -93,7 +93,7 @@ export async function deleteOne(
   next: NextFunction
 ) {
   try {
-    await deletePipeline(req.params.id);
+    await deletePipeline(req.params.pipelineId);
     res.status(200).json({
       message: "Pipeline Deleted Successfully",
     });
@@ -127,7 +127,7 @@ export async function assignUserToPipeline(
 
     await prisma.pipeline.update({
       where: {
-        id: req.params.id,
+        id: req.params.pipelineId,
       },
       data: {
         assignees: {
@@ -154,7 +154,7 @@ export async function removeUserFromPipeline(
 
     const pipeline = await prisma.pipeline.findUnique({
       where: {
-        id: req.params.id,
+        id: req.params.pipelineId,
       },
     });
     // Your logic for deleting a resource from the server goes here
@@ -166,7 +166,7 @@ export async function removeUserFromPipeline(
 
     await prisma.pipeline.update({
       where: {
-        id: req.params.id,
+        id: req.params.pipelineId,
       },
       data: {
         assignees: {
@@ -193,7 +193,7 @@ export async function changeOwnershipOfPipeline(
 
     await prisma.pipeline.update({
       where: {
-        id: req.params.id,
+        id: req.params.pipelineId,
       },
       data: {
         owner: newOwnerId,
