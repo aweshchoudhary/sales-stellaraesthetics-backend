@@ -28,7 +28,7 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
 
     // Your logic for retrieving many resources from the server goes here
     const pipelines = await prisma.pipeline.findMany(config);
-    const count = await prisma.pipeline.count(config);
+    const count = await prisma.pipeline.count({ where: config?.where });
 
     res.status(200).json({
       data: pipelines,
@@ -161,8 +161,6 @@ export async function removeUserFromPipeline(
     const filteredAssignees = pipeline?.assignees.filter(
       (e) => e !== assigneeId
     );
-
-    console.log(filteredAssignees);
 
     await prisma.pipeline.update({
       where: {

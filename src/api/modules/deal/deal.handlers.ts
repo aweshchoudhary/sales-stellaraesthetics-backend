@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
-import { deleteDeals } from "../../helper/delete.helper";
+import { deleteActivities, deleteDeals } from "../../helper/delete.helper";
 
 const prisma = new PrismaClient();
 
@@ -44,7 +44,7 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
 
     // Your logic for retrieving many resources from the server goes here
     const deals = await prisma.deal.findMany(config);
-    const count = await prisma.deal.count(config);
+    const count = await prisma.deal.count({ where: config?.where });
 
     res.status(200).json({
       data: deals,
@@ -109,7 +109,8 @@ export async function deleteOne(
   next: NextFunction
 ) {
   try {
-    await deleteDeals(req.params.id);
+    await prisma.deal.delete({ where: { id: req.params.id } });
+    await deleteActivities([req.params.id]);
 
     res.status(200).json({
       message: "Deal Deleted Successfully",

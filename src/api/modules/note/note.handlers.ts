@@ -7,24 +7,15 @@ const prisma = new PrismaClient();
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const note = await prisma.note.create({ data: req.body });
-    const updateDeals = req.body.deals.map(async (e: string) => {
-      await prisma.deal.update({
-        where: {
-          id: e,
-        },
-        data: {
-          notes: {
-            connect: {
-              id: note.id,
-            },
-          },
-        },
-      });
+    await prisma.deal.updateMany({
+      where: { id: { in: note.deals } },
+      data: { notes: { push: note.id } },
     });
-
-    await Promise.all(updateDeals);
-
-    res.status(200).json({ message: "Contact created successfully" });
+    await prisma.contact.updateMany({
+      where: { id: { in: note.contacts } },
+      data: { notes: { push: note.id } },
+    });
+    res.status(200).json({ message: "Note created successfully", data: note });
   } catch (error) {
     next(error); // Handle errors
   }
@@ -36,7 +27,7 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
 
     // Your logic for retrieving many resources from the server goes here
     const notes = await prisma.note.findMany(config);
-    const count = await prisma.note.count(config);
+    const count = await prisma.note.count({ where: config?.where });
 
     res.status(200).json({
       data: notes,
@@ -101,10 +92,10 @@ export async function deleteOne(
   next: NextFunction
 ) {
   try {
-    await prisma.label.delete({ where: { id: req.params.id } });
+    await prisma.note.delete({ where: { id: req.params.id } });
 
     res.status(200).json({
-      message: "Contact Deleted Successfully",
+      message: "Note Deleted Successfully",
     });
   } catch (error) {
     next(error); // Handle errors

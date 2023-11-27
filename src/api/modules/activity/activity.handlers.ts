@@ -7,22 +7,15 @@ const prisma = new PrismaClient();
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const activity = await prisma.activity.create({ data: req.body });
-    const updateActivitys = req.body.deals.map(async (e: string) => {
-      await prisma.deal.update({
-        where: {
-          id: e,
-        },
-        data: {
-          activities: {
-            connect: {
-              id: activity.id,
-            },
-          },
-        },
-      });
-    });
 
-    await Promise.all(updateActivitys);
+    await prisma.deal.updateMany({
+      where: { id: { in: activity.deals } },
+      data: { activities: { push: activity.id } },
+    });
+    await prisma.contact.updateMany({
+      where: { id: { in: activity.contacts } },
+      data: { activities: { push: activity.id } },
+    });
 
     res.status(200).json({ message: "Activity created successfully" });
   } catch (error) {
@@ -36,7 +29,7 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
 
     // Your logic for retrieving many resources from the server goes here
     const activities = await prisma.activity.findMany(config);
-    const count = await prisma.activity.count(config);
+    const count = await prisma.activity.count({ where: config?.where });
 
     res.status(200).json({
       data: activities,

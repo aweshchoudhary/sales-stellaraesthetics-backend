@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import helmet from "helmet";
 import bodyParser from "body-parser";
@@ -10,6 +10,10 @@ import api from "./api";
 import authenticate from "./api/modules/auth/auth.middleware";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./api/modules/auth/fireabase.config";
+import {
+  errorGeneratorMiddleware,
+  errorResponseMiddleware,
+} from "./api/middlewares/errors.middlewares";
 
 // Load environment variables from .env file
 config();
@@ -59,37 +63,28 @@ app.use(sessions(session));
 
 app.post("/auth", async (req, res) => {
   const { email, password } = req.body;
-  await signInWithEmailAndPassword(auth, email, password)
-    .then(async (userCredential) => {
-      const user1 = userCredential.user;
-      const token = await userCredential.user.getIdToken();
-      // console.log(user1);
-      res.json({ data: user1, token });
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage);
-      res.status(400).json({ error: errorMessage });
-    });
-
-  // admin
-  //   .auth()
-  //   .signInWithEmailAndPassword(email, password)
-  //   .then((userCredential) => {
-  //     // User is authenticated
-  //     const user = userCredential.user;
-  //     console.log(`User ${user.email} is authenticated`);
-  //   })
-  //   .catch((error) => {
-  //     // Authentication failed
-  //     console.error("Authentication failed:", error);
-  //   });
+  if (email && password) {
+    await signInWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        const user1 = userCredential.user;
+        const token = await userCredential.user.getIdToken();
+        res.json({ data: user1, token });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        res.status(400).json({ error: errorMessage });
+      });
+  }
 });
 
 // Mount the API routes under /api/v1 path
 app.use("/api/v1", authenticate, api);
 // app.use("/api/v1", isAuthenticated, api);
+
+app.use(errorGeneratorMiddleware);
+app.use(errorResponseMiddleware);
 
 // Start the server
 app.listen(PORT, () => {

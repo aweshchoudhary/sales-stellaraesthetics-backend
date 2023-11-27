@@ -45,7 +45,7 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
 
     // Your logic for retrieving many resources from the server goes here
     const stages = await prisma.stage.findMany(config);
-    const count = await prisma.stage.count(config);
+    const count = await prisma.stage.count({ where: config?.where });
 
     res.status(200).json({
       data: stages,

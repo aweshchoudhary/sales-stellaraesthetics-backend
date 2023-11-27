@@ -16,18 +16,20 @@ function queryStringCheck(req: Request) {
 
   if (filters) {
     const filtersArr: any = JSON.parse(filters);
-    filtersArr.forEach((item: any) => {
-      config.where = {
-        ...config.where,
-        [item.id]: item.value,
-      };
-    });
+    if (filters.length) {
+      filtersArr.forEach((item: any) => {
+        config.where = {
+          ...config.where,
+          [item.id]: item.value,
+        };
+      });
+    }
   }
 
   if (limit) config.take = Number(limit);
   if (start) config.skip = Number(start);
-  if (populate) config.include = populate;
-  if (select) config.select = select;
+  if (populate) config.include = JSON.parse(populate);
+  // if (select) config.select = select;
 
   return config;
 }

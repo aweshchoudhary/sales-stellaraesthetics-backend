@@ -10,6 +10,22 @@ datasource db {
   url      = env("DB_URI")
 }
 
+model User {
+  id          String     @id @default(uuid())
+  name        String
+  firebaseUID String
+  roles       ROLES      @default(USER)
+  notes       Note[]
+  files       File[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Contacts    Contact[]
+  Deals       Deal[]
+  Pipelines   Pipeline[]
+  creators    Activity[] @relation("Creator")
+  performers  Activity[] @relation("Performer")
+}
+
 model Label {
   id        String   @id @default(uuid())
   name      String
@@ -20,25 +36,29 @@ model Label {
 }
 
 model Note {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   note      String
-  deals     Deal[]
-  contacts  Contact[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  deals     String[]
+  contacts  String[]
+  creator   User     @relation(fields: [creatorId], references: [id])
+  creatorId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model File {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   type      String
   size      BigInt
   url       String
-  deals     Deal[]
-  contacts  Contact[]
+  deals     String[]
+  contacts  String[]
   uploader  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 }
 
 model Activity {
@@ -54,10 +74,12 @@ model Activity {
   googleEventId       String?
   googleEventHtmlLink String?
   icon                String
-  deals               Deal[]
-  contacts            Contact[]
-  performer           String // Assuming String is another model
-  creator             String // Assuming String is another model
+  deals               String[]
+  contacts            String[]
+  performer           User?         @relation("Performer", fields: [performerId], references: [id])
+  performerId         String?
+  creator             User          @relation("Creator", fields: [creatorId], references: [id])
+  creatorId           String
   completedOn         DateTime?
   // Time Stamp
   createdAt           DateTime      @default(now())
@@ -65,40 +87,43 @@ model Activity {
 }
 
 model Contact {
-  id            String     @id @default(uuid())
+  id            String   @id @default(uuid())
   company       String
   contactPerson String // Fix typo in field name
   mobile        String
   whatsapp      String
   email         String
-  notes         Note[]
-  activities    Activity[]
-  files         File[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  notes         String[]
+  activities    String[]
+  files         String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  creator       User     @relation(fields: [creatorId], references: [id])
+  creatorId     String
 }
 
 model Deal {
-  id                  String     @id @default(uuid())
+  id                  String   @id @default(uuid())
   name                String
   desc                String?
-  currency            String     @default("INR")
-  value               Int        @default(0)
-  status              STATUS     @default(OPEN)
-  expectedClosingDate DateTime   @default(now())
+  currency            String   @default("INR")
+  value               Int      @default(0)
+  status              STATUS   @default(OPEN)
+  expectedClosingDate DateTime @default(now())
   labelId             String
-  label               Label      @relation(fields: [labelId], references: [id])
-  currentStage        Stage      @relation(fields: [currentStageId], references: [id])
+  label               Label    @relation(fields: [labelId], references: [id])
+  currentStage        Stage    @relation(fields: [currentStageId], references: [id])
   currentStageId      String
-  contacts            String[] // Assuming Contact is another model
+  contacts            String[]
   items               String[] // Assuming Item is another model
   // Activities 
-  notes               Note[]
-  files               File[]
-  activities          Activity[]
-  creator             String // Assuming String is another model
+  notes               String[]
+  files               String[]
+  activities          String[]
+  creator             User     @relation(fields: [creatorId], references: [id])
+  creatorId           String
   pipelineId          String
-  Pipeline            Pipeline   @relation(fields: [pipelineId], references: [id])
+  Pipeline            Pipeline @relation(fields: [pipelineId], references: [id])
 
   // Time Stamps
   createdAt DateTime @default(now())
@@ -124,7 +149,8 @@ model Pipeline {
   stages    Stage[]
   deals     Deal[]
   assignees String[] // Assuming String is another model
-  owner     String // Assuming String is another model
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

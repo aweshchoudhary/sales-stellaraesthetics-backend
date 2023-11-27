@@ -55,11 +55,11 @@ export async function deleteDeals(stageId: string) {
 
 export async function deleteActivities(dealIds: string[]) {
   await prisma.activity.deleteMany({
-    where: { deals: { some: { id: { in: dealIds } } } },
+    where: { deals: { hasSome: dealIds } },
   });
 }
 export async function deleteNotes(dealIds: string[]) {
   await prisma.note.deleteMany({
-    where: { deals: { some: { id: { in: dealIds } } } },
+    where: { deals: { hasSome: dealIds } },
   });
 }
