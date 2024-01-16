@@ -8,13 +8,21 @@ const prisma = new PrismaClient();
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const loggedUser: any = req.user;
-    // Your logic for creating a resource on the server goes here
-    await prisma.pipeline.create({
-      data: {
-        ...req.body,
-        owner: loggedUser.uid,
+    const user = await prisma.user.findFirst({
+      where: {
+        firebaseUID: loggedUser.uid ?? "",
       },
     });
+    // Your logic for creating a resource on the server goes here
+    console.log(user);
+
+    user &&
+      (await prisma.pipeline.create({
+        data: {
+          ...req.body,
+          owner: { connect: { id: user.id } },
+        },
+      }));
 
     res.status(200).json({ message: "Pipeline created successfully" });
   } catch (error) {
@@ -194,7 +202,11 @@ export async function changeOwnershipOfPipeline(
         id: req.params.pipelineId,
       },
       data: {
-        owner: newOwnerId,
+        owner: {
+          connect: {
+            id: newOwnerId,
+          },
+        },
       },
     });
 

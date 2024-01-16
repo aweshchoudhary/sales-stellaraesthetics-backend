@@ -110,8 +110,8 @@ model Deal {
   value               Int      @default(0)
   status              STATUS   @default(OPEN)
   expectedClosingDate DateTime @default(now())
-  labelId             String
-  label               Label    @relation(fields: [labelId], references: [id])
+  labelId             String?
+  label               Label?   @relation(fields: [labelId], references: [id])
   currentStage        Stage    @relation(fields: [currentStageId], references: [id])
   currentStageId      String
   contacts            String[]
@@ -123,7 +123,7 @@ model Deal {
   creator             User     @relation(fields: [creatorId], references: [id])
   creatorId           String
   pipelineId          String
-  Pipeline            Pipeline @relation(fields: [pipelineId], references: [id])
+  pipeline            Pipeline @relation(fields: [pipelineId], references: [id])
 
   // Time Stamps
   createdAt DateTime @default(now())

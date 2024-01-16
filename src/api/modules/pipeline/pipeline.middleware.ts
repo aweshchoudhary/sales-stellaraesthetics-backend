@@ -12,7 +12,9 @@ export async function checkPipelineOwnerAccess(
   const pipeline = await prisma.pipeline.count({
     where: {
       id: req.params.pipelineId ?? req.body.pipelineId,
-      owner: loggedUser.uid,
+      owner: {
+        firebaseUID: loggedUser.uid,
+      },
     },
   });
 
@@ -55,7 +57,14 @@ export async function checkPipelineAccess(
   const pipeline = await prisma.pipeline.count({
     where: {
       id: req.params.pipelineId ?? req.body.pipelineId,
-      OR: [{ owner: loggedUser.uid }, { assignees: { has: loggedUser.uid } }],
+      OR: [
+        {
+          owner: {
+            firebaseUID: loggedUser.uid,
+          },
+        },
+        { assignees: { has: loggedUser.uid } },
+      ],
     },
   });
 

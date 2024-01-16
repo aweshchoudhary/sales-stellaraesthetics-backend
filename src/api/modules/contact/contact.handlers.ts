@@ -6,11 +6,23 @@ const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const contact = await prisma.contact.create({ data: req.body });
+    const { company, contactPerson, email, mobile, whatsapp, creator }: any =
+      req.body;
+    const contact = await prisma.contact.create({
+      data: {
+        company,
+        contactPerson,
+        email,
+        mobile,
+        whatsapp,
+        creatorId: creator,
+      },
+    });
     res
       .status(200)
       .json({ message: "Contact created successfully", data: contact });
   } catch (error) {
+    console.log(error);
     next(error); // Handle errors
   }
 }
