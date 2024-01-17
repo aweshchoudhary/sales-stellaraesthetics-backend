@@ -6,14 +6,9 @@ const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const contact = await prisma.contact.create({
-      data: req.body,
-    });
-    res
-      .status(200)
-      .json({ message: "Contact created successfully", data: contact });
+    const user = await prisma.user.create({ data: req.body });
+    res.status(200).json({ message: "user created successfully", data: user });
   } catch (error) {
-    console.log(error);
     next(error); // Handle errors
   }
 }
@@ -23,11 +18,11 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
     const config = queryStringCheck(req);
 
     // Your logic for retrieving many resources from the server goes here
-    const contacts = await prisma.contact.findMany(config);
-    const count = await prisma.contact.count(config);
+    const users = await prisma.user.findMany(config);
+    const count = await prisma.user.count({ where: config?.where });
 
     res.status(200).json({
-      data: contacts,
+      data: users,
       count,
     });
   } catch (error) {
@@ -40,7 +35,7 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     const config = queryStringCheck(req);
 
     // Your logic for retrieving a single resource from the server goes here
-    const contact = await prisma.contact.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: req.params.id,
       },
@@ -48,7 +43,7 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
     });
 
     res.status(200).json({
-      data: contact,
+      data: user,
     });
   } catch (error) {
     next(error); // Handle errors
@@ -64,11 +59,11 @@ export async function updateOne(
     if (req.body.id) {
       return res
         .status(400)
-        .json({ message: "You cannot change the id of this contact" });
+        .json({ message: "You cannot change the id of this user" });
     }
 
     // Your logic for updating a resource on the server goes here
-    const contact = await prisma.contact.update({
+    const user = await prisma.user.update({
       where: {
         id: req.params.id,
       },
@@ -76,7 +71,7 @@ export async function updateOne(
     });
 
     res.status(200).json({
-      data: contact,
+      data: user,
     });
   } catch (error) {
     next(error); // Handle errors
@@ -89,10 +84,10 @@ export async function deleteOne(
   next: NextFunction
 ) {
   try {
-    await prisma.label.delete({ where: { id: req.params.id } });
+    await prisma.user.delete({ where: { id: req.params.id } });
 
     res.status(200).json({
-      message: "Contact Deleted Successfully",
+      message: "user Deleted Successfully",
     });
   } catch (error) {
     next(error); // Handle errors

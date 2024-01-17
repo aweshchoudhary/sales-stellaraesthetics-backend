@@ -21,7 +21,7 @@ export const errorResponseMiddleware = (
   // Set the status code of the response
   res.status(err.status || 500);
 
-  console.log(err);
+  // console.log(err);
 
   // Send the error message in the response
   res.json({

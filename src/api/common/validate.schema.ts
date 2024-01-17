@@ -5,7 +5,6 @@ const validate =
   (schema: AnyZodObject) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body);
       await schema.parseAsync({
         body: req.body,
         query: req.query,
@@ -13,7 +12,8 @@ const validate =
       });
       return next();
     } catch (error) {
-      return res.status(400).json(error);
+      res.status(400).json(error);
+      // next(error);
     }
   };
 

@@ -64,7 +64,7 @@ CREATE TABLE "File" (
 CREATE TABLE "Activity" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "type" "ActivityTypes" NOT NULL,
+    "type" TEXT NOT NULL,
     "start" TIMESTAMP(3) NOT NULL,
     "end" TIMESTAMP(3) NOT NULL,
     "desc" TEXT,
@@ -111,7 +111,7 @@ CREATE TABLE "Deal" (
     "value" INTEGER NOT NULL DEFAULT 0,
     "status" "STATUS" NOT NULL DEFAULT 'OPEN',
     "expectedClosingDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "labelId" TEXT NOT NULL,
+    "labelId" TEXT,
     "currentStageId" TEXT NOT NULL,
     "contacts" TEXT[],
     "items" TEXT[],
@@ -168,7 +168,7 @@ ALTER TABLE "Activity" ADD CONSTRAINT "Activity_creatorId_fkey" FOREIGN KEY ("cr
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Deal" ADD CONSTRAINT "Deal_labelId_fkey" FOREIGN KEY ("labelId") REFERENCES "Label"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Deal" ADD CONSTRAINT "Deal_labelId_fkey" FOREIGN KEY ("labelId") REFERENCES "Label"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Deal" ADD CONSTRAINT "Deal_currentStageId_fkey" FOREIGN KEY ("currentStageId") REFERENCES "Stage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
