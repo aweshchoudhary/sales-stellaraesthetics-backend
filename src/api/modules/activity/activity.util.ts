@@ -18,7 +18,7 @@ export interface ActivityBaseInterface {
 
   files: ActivityFiles[];
   performerId: string | (UserBaseInterface & BaseModel);
-  creatorId: string | (UserBaseInterface & BaseModel);
+  createdById: string | (UserBaseInterface & BaseModel);
   dealId: string | (DealBaseInterface & BaseModel);
   contactId: string | (UserBaseInterface & BaseModel);
 }
@@ -56,7 +56,7 @@ export const activityCreateSchema = z.object({
     performerId: z.string({
       required_error: "Activity Performer is required",
     }),
-    creatorId: z.string({
+    createdById: z.string({
       required_error: "Activity Creator is required",
     }),
     completed_on: z.date().optional(),
@@ -107,7 +107,6 @@ export const activityUpdateSchema = z.object({
       .url({ message: "Not a valid Activity Task Url" })
       .optional(),
     performerId: z.string().optional(),
-    creatorId: z.string().optional(),
     completed_on: z.date().optional(),
     googleEventId: z.string().optional(),
     googleEventHtmlLink: z.string().optional(),

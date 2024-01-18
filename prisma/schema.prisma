@@ -16,13 +16,28 @@ model User {
   email               String
   mobile              String
   userId              String
-  apiKey              String?
-  roles               ROLES                        @default(USER)
+  apiKey              ApiKey?
+  roles               String                       @default("user")
   notifications       NotificationsOnUsers[]
   notificationsOpened NotificationsOpenByOnUsers[]
+  created             UserCreated?
+  createdById         String?
   createdAt           DateTime                     @default(now())
   updatedAt           DateTime                     @updatedAt
-  created             UserCreated?
+}
+
+model ApiKey {
+  id          String       @id @default(uuid())
+  name        String?
+  desc        String?
+  key         String
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String       @unique
+  status      String       @default("active")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  createdBy   UserCreated? @relation(fields: [createdById], references: [id])
+  createdById String?
 }
 
 model Notification {
@@ -71,50 +86,53 @@ model UserCreated {
   activitiesPerform Activity[]             @relation("performedBy")
   activitiesCreated Activity[]             @relation("createdBy")
   Label             Label[]
+  ActivityFile      ActivityFile[]
+  ApiKey            ApiKey[]
+  createdById       String
 }
 
 model Label {
-  id         String      @id @default(uuid())
-  label      String
-  desc       String?
-  color      String
-  pipeline   Pipeline    @relation(fields: [pipelineId], references: [id])
-  pipelineId String
-  creator    UserCreated @relation(fields: [creatorId], references: [id])
-  creatorId  String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  deals      Deal[]
+  id          String      @id @default(uuid())
+  label       String
+  desc        String?
+  color       String
+  pipeline    Pipeline    @relation(fields: [pipelineId], references: [id])
+  pipelineId  String
+  createdBy   UserCreated @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deals       Deal[]
 }
 
 model Note {
-  id        String      @id @default(uuid())
-  content   String
-  deal      Deal        @relation(fields: [dealId], references: [id])
-  dealId    String
-  contact   Contact     @relation(fields: [contactId], references: [id])
-  contactId String
-  creator   UserCreated @relation(fields: [creatorId], references: [id])
-  creatorId String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  content     String
+  deal        Deal        @relation(fields: [dealId], references: [id])
+  dealId      String
+  contact     Contact     @relation(fields: [contactId], references: [id])
+  contactId   String
+  createdBy   UserCreated @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model File {
-  id         String      @id @default(uuid())
-  name       String
-  desc       String?
-  size       BigInt
-  type       String
-  url        String
-  deal       Deal        @relation(fields: [dealId], references: [id])
-  dealId     String
-  contact    Contact     @relation(fields: [contactId], references: [id])
-  contactId  String
-  uploader   UserCreated @relation(fields: [uploaderId], references: [id])
-  uploaderId String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  name        String
+  desc        String?
+  size        BigInt
+  type        String
+  url         String
+  deal        Deal        @relation(fields: [dealId], references: [id])
+  dealId      String
+  contact     Contact     @relation(fields: [contactId], references: [id])
+  contactId   String
+  createdBy   UserCreated @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model Activity {
@@ -131,8 +149,8 @@ model Activity {
   completedOn         DateTime?
   performer           UserCreated?   @relation("performedBy", fields: [performerId], references: [id])
   performerId         String?
-  creator             UserCreated?   @relation("createdBy", fields: [creatorId], references: [id])
-  creatorId           String?
+  createdBy           UserCreated?   @relation("createdBy", fields: [createdById], references: [id])
+  createdById         String?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
   files               ActivityFile[]
@@ -143,34 +161,36 @@ model Activity {
 }
 
 model ActivityFile {
-  id         String   @id @default(uuid())
-  activity   Activity @relation(fields: [activityId], references: [id])
-  activityId String
-  desc       String?
-  name       String
-  path       String
-  url        String
-  type       String
-  size       BigInt
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String      @id @default(uuid())
+  activity    Activity    @relation(fields: [activityId], references: [id])
+  activityId  String
+  desc        String?
+  name        String
+  path        String
+  url         String
+  type        String
+  size        BigInt
+  createdById String
+  createdBy   UserCreated @relation(fields: [createdById], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model Contact {
-  id          String       @id @default(uuid())
+  id          String      @id @default(uuid())
   fullname    String
   companyName String?
   mobile      String
   whatsapp    String
   email       String
-  creatorId   String?
-  creator     UserCreated? @relation(fields: [creatorId], references: [id])
+  createdById String
+  createdBy   UserCreated @relation(fields: [createdById], references: [id])
   notes       Note[]
   activities  Activity[]
   files       File[]
   deal        Deal[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model Deal {
@@ -194,37 +214,37 @@ model Deal {
   pipeline            Pipeline     @relation(fields: [pipelineId], references: [id])
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
-  creatorId           String?
-  creator             UserCreated? @relation(fields: [creatorId], references: [id])
+  createdById         String
+  createdBy           UserCreated? @relation(fields: [createdById], references: [id])
   // items               String[] // Assuming Item is another model
 }
 
 model Stage {
-  id         String       @id @default(uuid())
-  name       String
-  desc       String?
-  position   Int          @default(1)
-  pipelineId String
-  pipeline   Pipeline     @relation(fields: [pipelineId], references: [id])
-  deals      Deal[]
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  creatorId  String?
-  creator    UserCreated? @relation(fields: [creatorId], references: [id])
+  id          String      @id @default(uuid())
+  name        String
+  desc        String?
+  position    Int         @default(1)
+  pipelineId  String
+  pipeline    Pipeline    @relation(fields: [pipelineId], references: [id])
+  deals       Deal[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  createdById String
+  createdBy   UserCreated @relation(fields: [createdById], references: [id])
 }
 
 model Pipeline {
-  id        String                 @id @default(uuid())
-  name      String
-  desc      String?
-  stages    Stage[]
-  deals     Deal[]
-  assignees AssigneesOnPipelines[]
-  owner     UserCreated            @relation(fields: [ownerId], references: [id])
-  ownerId   String
-  createdAt DateTime               @default(now())
-  updatedAt DateTime               @updatedAt
-  Label     Label[]
+  id          String                 @id @default(uuid())
+  name        String
+  desc        String?
+  stages      Stage[]
+  deals       Deal[]
+  assignees   AssigneesOnPipelines[]
+  createdBy   UserCreated            @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  Label       Label[]
 }
 
 model AssigneesOnPipelines {

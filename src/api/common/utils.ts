@@ -7,16 +7,21 @@ export interface SortInterface {
 
 export interface GetManyFiltersInterface {
   sort: SortInterface[];
-  populate: any;
+  populate: string;
   limit: number;
   skip: number;
 }
 
-export const GetManyFilters = z.object({
-  name: z.string().optional(),
-  desc: z.string().optional(),
-  stages: z.array(z.string()).nullable().optional(),
-  deals: z.array(z.string()).nullable().optional(),
-  assignees: z.array(z.string()).nullable().optional(),
-  owner: z.string().optional(),
+export const getManyReqFilters = z.object({
+  sort: z
+    .array(
+      z.object({
+        id: z.string(),
+        desc: z.boolean(),
+      })
+    )
+    .optional(),
+  populate: z.string().optional(),
+  limit: z.number().min(0).max(100).optional(),
+  skip: z.number().optional(),
 });

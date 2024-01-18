@@ -10,7 +10,7 @@ export interface PipelineBaseInterface {
   stages: string[] | (StageBaseInterface & BaseModel)[];
   deals: string[] | (DealBaseInterface & BaseModel)[];
   assignees: string[] | (UserBaseInterface & BaseModel)[];
-  owner: string | (UserBaseInterface & BaseModel);
+  createdById: string | (UserBaseInterface & BaseModel);
 }
 
 export const pipelineCreateSchema = z.object({
@@ -22,7 +22,7 @@ export const pipelineCreateSchema = z.object({
     stages: z.array(z.string()).nullable().optional(),
     deals: z.array(z.string()).nullable().optional(),
     assignees: z.array(z.string()).nullable().optional(),
-    owner: z.string({
+    createdById: z.string({
       required_error: "Pipeline Owner is required",
     }),
   }),
@@ -35,7 +35,14 @@ export const pipelineUpdateSchema = z.object({
     stages: z.array(z.string()).nullable().optional(),
     deals: z.array(z.string()).nullable().optional(),
     assignees: z.array(z.string()).nullable().optional(),
-    owner: z.string().optional(),
+  }),
+});
+
+export const pipelineGetByUserIdSchema = z.object({
+  body: z.object({
+    createdById: z.string({
+      required_error: "User ID is required",
+    }),
   }),
 });
 

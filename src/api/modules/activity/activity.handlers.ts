@@ -12,7 +12,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     await prisma.activity.create({ data: validFields });
     res.status(200).json({ message: "Activity created successfully" });
   } catch (error) {
-    next(error); // Handle errors
+    next(error);
   }
 }
 
@@ -21,8 +21,8 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
     const config = queryStringCheck(req);
 
     // Your logic for retrieving many resources from the server goes here
-    const activities = await prisma.activity.findMany(config);
-    const count = await prisma.activity.count({ where: config?.where });
+    const activities = await prisma.activity.findMany({ where: {}, ...config });
+    const count = await prisma.activity.count({ where: {} });
 
     res.status(200).json({
       data: activities,

@@ -12,7 +12,7 @@ export interface FileBaseInterface {
   url: string;
   dealId: string | (DealBaseInterface & BaseModel);
   contactId: string | (ContactBaseInterface & BaseModel);
-  uploaderId: string | (UserBaseInterface & BaseModel);
+  createdById: string | (UserBaseInterface & BaseModel);
 }
 
 export const fileCreateSchema = z.object({
@@ -24,7 +24,7 @@ export const fileCreateSchema = z.object({
     contactId: z.string({
       required_error: "Contact Id is required",
     }),
-    uploaderId: z.string({
+    createdById: z.string({
       required_error: "File uploader is required",
     }),
   }),
@@ -53,6 +53,6 @@ export const fileUpdateSchema = z.object({
     url: z.string().optional(),
     dealId: z.string().optional(),
     contactId: z.string().optional(),
-    uploaderId: z.string().optional(),
+    createdById: z.string().optional(),
   }),
 });

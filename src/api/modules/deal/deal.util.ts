@@ -21,7 +21,7 @@ export interface DealBaseInterface {
   notes: string | (NoteBaseInterface & BaseModel)[];
   activities: string | (ActivityBaseInterface & BaseModel)[];
   files: string | (FileBaseInterface & BaseModel)[];
-  creator: string | (UserBaseInterface & BaseModel);
+  createdById: string | (UserBaseInterface & BaseModel);
 }
 
 export const dealCreateSchema = z.object({
@@ -45,7 +45,7 @@ export const dealCreateSchema = z.object({
     // items: z.array(z.string()).nullable(),
     notes: z.array(z.string()).nullable(),
     files: z.array(z.string()).nullable(),
-    creator: z.string(),
+    createdById: z.string(),
   }),
 });
 

@@ -7,7 +7,7 @@ export interface NoteBaseInterface {
   content: string;
   dealId: string | (DealBaseInterface & BaseModel);
   contactId: string | (ContactBaseInterface & BaseModel);
-  creatorId: string;
+  createdById: string;
 }
 
 export const noteCreateSchema = z.object({
@@ -21,7 +21,7 @@ export const noteCreateSchema = z.object({
     contactId: z.string({
       required_error: "Contact ID is required",
     }),
-    creatorId: z.string({
+    createdById: z.string({
       required_error: "Creator ID is required",
     }),
   }),
@@ -32,6 +32,6 @@ export const noteUpdateSchema = z.object({
     content: z.string().optional(),
     dealId: z.string().optional(),
     contactId: z.string().optional(),
-    creatorId: z.string().optional(),
+    createdById: z.string().optional(),
   }),
 });

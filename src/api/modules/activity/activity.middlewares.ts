@@ -27,7 +27,7 @@ export async function verifyActivityAccess(
 ) {
   try {
     const activity = await prisma.activity.count({
-      where: { id: req.params.id, creator: req.body.creatorId },
+      where: { id: req.params.id, createdBy: req.body.createdById },
     });
     if (activity !== 1) {
       res.status(401).json({ message: "You don't access to this activity" });

@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
 import { userCreateSchema, userPublicUpdateSchema } from "./user.util";
+import { isUserExistWithId } from "./user.controllers";
+import bcrypt from "bcrypt";
+import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -121,5 +124,77 @@ export async function deleteOne(
     });
   } catch (error) {
     next(error); // Handle errors
+  }
+}
+
+export async function generateAPIKey(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const isUserExist = await isUserExistWithId(req.params.userId);
+    if (!isUserExist) res.status(404).json({ message: "User not found" });
+
+    const loggedUser: any = req.user;
+
+    if (loggedUser?.id !== req.params.userId)
+      res
+        .status(400)
+        .json({ message: "You cannot generate api key for others" });
+
+    const saltRounds = 10;
+    const token = randomUUID();
+    const hashedToken = await bcrypt.hash(token, saltRounds);
+
+    const apiKeyData = await prisma.apiKey.create({
+      data: {
+        key: hashedToken,
+        userId: req.params.userId,
+      },
+    });
+    await prisma.user.update({
+      where: {
+        id: req.params.userId,
+      },
+      data: {
+        apiKey: {
+          connect: {
+            id: apiKeyData.id,
+          },
+        },
+      },
+    });
+    return res.status(200).json({ apiKey: hashedToken });
+  } catch (error) {
+    next && next(error);
+    console.log(error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+export async function deleteAPIKey(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const isUserExist = await isUserExistWithId(req.params.userId);
+    if (!isUserExist) res.status(404).json({ message: "User not found" });
+
+    const loggedUser: any = req.user;
+
+    if (loggedUser?.id === req.params.userId) {
+      await prisma.apiKey.delete({
+        where: {
+          userId: req.params.userId,
+        },
+      });
+      return res.status(200).json({ message: "Api key deleted successfully" });
+    }
+  } catch (error) {
+    next && next(error);
+  } finally {
+    await prisma.$disconnect();
   }
 }

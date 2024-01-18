@@ -1,11 +1,13 @@
 import { Request } from "express";
+import { getManyReqFilters } from "../common/utils";
 
 function queryStringCheck(req: Request) {
-  const { filters, sort, limit, populate, select, start }: any = req.query;
+  const { sort, skip, limit, populate } = getManyReqFilters.parse(req.query);
   const config: any = {};
 
   if (sort) {
-    const sortArr: any = JSON.parse(sort);
+    let sortJSON: any = sort;
+    const sortArr: any = JSON.parse(sortJSON);
     sortArr.forEach((item: { id: string; desc: boolean }) => {
       config.orderBy = {
         ...config.orderBy,
@@ -14,22 +16,9 @@ function queryStringCheck(req: Request) {
     });
   }
 
-  if (filters) {
-    const filtersArr: any = JSON.parse(filters);
-    if (filters.length) {
-      filtersArr.forEach((item: any) => {
-        config.where = {
-          ...config.where,
-          [item.id]: item.value,
-        };
-      });
-    }
-  }
-
-  if (limit) config.take = Number(limit);
-  if (start) config.skip = Number(start);
+  if (limit) config.take = Number(limit) ?? 10;
+  if (skip) config.skip = Number(skip) ?? 0;
   if (populate) config.include = JSON.parse(populate);
-  // if (select) config.select = select;
 
   return config;
 }

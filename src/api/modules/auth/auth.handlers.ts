@@ -1,74 +1,72 @@
 import { NextFunction, Request, Response } from "express";
+import { isUserExistWithId } from "../user/user.controllers";
 import { PrismaClient } from "@prisma/client";
-import { auth } from "./fireabase.config";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updatePassword,
-} from "firebase/auth";
+import { getLoggedUserDetials } from "../../common/common.middlewares";
 
 const prisma = new PrismaClient();
 
-export async function registerUser(
+export async function generateAPIKey(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const newUserData: any = req.body;
-    const response = await createUserWithEmailAndPassword(
-      auth,
-      newUserData.email,
-      newUserData.password
-    );
+    const isUserExist = await isUserExistWithId(req.params.id);
+    if (!isUserExist) res.status(404).json({ message: "User not found" });
 
-    // Your logic for creating a resource on the server goes here
-    await prisma.user.create({
-      data: {
-        name: req.body.name,
-        firebaseUID: response.user.uid,
-      },
-    });
+    const loggedUser = await getLoggedUserDetials(req, next);
 
-    res.status(200).json({ message: "User registered successfully" });
-  } catch (error) {
-    next(error); // Handle errors
-  }
-}
-export async function login(req: Request, res: Response, next: NextFunction) {
-  try {
-    const { email, password } = req.body;
-    if (email && password) {
-      await signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user1 = userCredential.user;
-          const token = await userCredential.user.getIdToken();
-          res.cookie("accessToken", token);
-          res.json({ data: user1, token });
-        })
-        .catch((error) => {
-          const errorMessage = error.message;
-          res.status(400).json({ error: errorMessage });
-        });
+    if (loggedUser?.id === req.params.id) {
+      const apiKey = crypto.randomUUID();
+      const apiKeyData = await prisma.apiKey.create({
+        data: {
+          key: apiKey,
+          userId: req.params.id,
+        },
+      });
+      await prisma.user.update({
+        where: {
+          id: req.params.id,
+        },
+        data: {
+          apiKey: {
+            connect: {
+              id: apiKeyData.id,
+            },
+          },
+        },
+      });
+      return res.status(200).json({ apiKey });
     }
   } catch (error) {
-    next(error); // Handle errors
+    next && next(error);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-export async function passswordChange(
+export async function deleteAPIKey(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { newPassword } = req.body;
-    const user: any = req.user;
-    if (newPassword) {
-      await updatePassword(user, newPassword);
+    const isUserExist = await isUserExistWithId(req.params.id);
+    if (!isUserExist) res.status(404).json({ message: "User not found" });
+
+    const loggedUser = await getLoggedUserDetials(req, next);
+
+    if (loggedUser?.id === req.params.id) {
+      await prisma.apiKey.delete({
+        where: {
+          userId: req.params.id,
+        },
+      });
+      return res.status(200).json({ message: "Api key deleted successfully" });
     }
-    res.status(200).json({ message: "Password Updated" });
   } catch (error) {
-    next(error); // Handle errors
+    next && next(error);
+  } finally {
+    await prisma.$disconnect();
   }
 }

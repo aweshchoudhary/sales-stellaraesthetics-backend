@@ -5,7 +5,7 @@ export interface LabelBaseInterface {
   desc?: string;
   color: string;
   pipelineId: string;
-  creatorId: string;
+  createdById: string;
 }
 
 export const labelCreateSchema = z.object({
@@ -20,7 +20,7 @@ export const labelCreateSchema = z.object({
     pipelineId: z.string({
       required_error: "Pipeline ID is required",
     }),
-    creatorId: z.string({
+    createdById: z.string({
       required_error: "Creator ID is required",
     }),
   }),
@@ -32,6 +32,6 @@ export const labelUpdateSchema = z.object({
     desc: z.string().optional(),
     color: z.string().optional(),
     pipelineId: z.string().optional(),
-    creatorId: z.string().optional(),
+    createdById: z.string().optional(),
   }),
 });

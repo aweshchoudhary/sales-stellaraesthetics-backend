@@ -6,6 +6,7 @@ import { NoteBaseInterface } from "../note/note.util";
 import { FileBaseInterface } from "../file/file.util";
 import { ContactBaseInterface } from "../contact/contact.util";
 import { ActivityBaseInterface } from "../activity/activity.util";
+import { APIKeyBaseInterface } from "../auth/auth.utils";
 
 export interface noteModel extends BaseModel, NoteBaseInterface {}
 export interface activityModel extends BaseModel, ActivityBaseInterface {}
@@ -21,7 +22,7 @@ export interface UserBaseInterface {
   mobile: string;
   userId: string;
   roles: string;
-  apiKey: string | null;
+  apiKey?: string | (APIKeyBaseInterface & BaseModel);
   created?: {
     activities: activityModel[];
     notes: noteModel[];
@@ -31,6 +32,7 @@ export interface UserBaseInterface {
     pipelines: pipelineModel[];
     perform_activities: activityModel[];
   };
+  createdBy?: string;
 }
 
 export const userCreateSchema = z.object({
@@ -61,6 +63,7 @@ export const userCreateSchema = z.object({
         performers: z.array(z.string()).nullable().optional(),
       })
       .optional(),
+    createdBy: z.string().optional(),
   }),
 });
 

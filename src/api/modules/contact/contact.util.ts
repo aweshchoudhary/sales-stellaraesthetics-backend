@@ -6,6 +6,7 @@ export interface ContactBaseInterface {
   mobile: string;
   whatsapp: string;
   email: string;
+  createdById: string;
 }
 
 export const contactCreateSchema = z.object({
@@ -25,6 +26,9 @@ export const contactCreateSchema = z.object({
         required_error: "Contact Name is required",
       })
       .email({ message: "Not a valid email" }),
+    createdById: z.string({
+      required_error: "Creator ID is required",
+    }),
   }),
 });
 

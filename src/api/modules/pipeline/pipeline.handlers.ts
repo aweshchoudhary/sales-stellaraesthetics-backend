@@ -2,10 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
 import { deletePipeline } from "../../helper/delete.helper";
-import { getLoggedUserDetials } from "../../common/common.middlewares";
 import {
   pipelineAssignUserSchema,
   pipelineChangeOwnershipSchema,
+  pipelineGetByUserIdSchema,
 } from "./pipeline.util";
 import { isUserExistWithId } from "../user/user.controllers";
 import { isPipelineExistWithId } from "./pipeline.controllers";
@@ -14,13 +14,13 @@ const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const loggedUser = await getLoggedUserDetials(req, next);
+    const loggedUser: any = req.user;
     // Your logic for creating a resource on the server goes here
     if (loggedUser) {
       await prisma.pipeline.create({
         data: {
           ...req.body,
-          owner: { connect: { id: loggedUser?.id } },
+          createdBy: { connect: { id: loggedUser?.id } },
         },
       });
     }
@@ -38,6 +38,30 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
     // Your logic for retrieving many resources from the server goes here
     const pipelines = await prisma.pipeline.findMany(config);
     const count = await prisma.pipeline.count({ where: config?.where });
+
+    res.status(200).json({
+      data: pipelines,
+      count,
+    });
+  } catch (error) {
+    next(error); // Handle errors
+  }
+}
+
+export async function getManyByUserId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const validateRequest = pipelineGetByUserIdSchema.parse(req);
+    // const config = queryStringCheck(req);
+    const filters = {
+      createdById: validateRequest.body.createdById,
+    };
+
+    const pipelines = await prisma.pipeline.findMany({ where: filters });
+    const count = await prisma.pipeline.count({ where: filters });
 
     res.status(200).json({
       data: pipelines,
@@ -209,7 +233,7 @@ export async function changeOwnershipOfPipeline(
         id: req.params.pipelineId,
       },
       data: {
-        owner: {
+        createdBy: {
           connect: {
             id: validRequest.body.newOwnerId,
           },
