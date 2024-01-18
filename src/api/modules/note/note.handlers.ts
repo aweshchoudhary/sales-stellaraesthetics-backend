@@ -1,20 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
+import { noteCreateSchema } from "./note.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const note = await prisma.note.create({ data: req.body });
-    await prisma.deal.updateMany({
-      where: { id: { in: note.deals } },
-      data: { notes: { push: note.id } },
-    });
-    await prisma.contact.updateMany({
-      where: { id: { in: note.contacts } },
-      data: { notes: { push: note.id } },
-    });
+    const validRequest = noteCreateSchema.parse(req);
+
+    const note = await prisma.note.create({ data: validRequest.body });
+
     res.status(200).json({ message: "Note created successfully", data: note });
   } catch (error) {
     next(error); // Handle errors

@@ -1,12 +1,16 @@
 import { z } from "zod";
+import { StageBaseInterface } from "../stage/stage.util";
+import { BaseModel } from "../../common/interfaces";
+import { DealBaseInterface } from "../deal/deal.util";
+import { UserBaseInterface } from "../user/user.util";
 
 export interface PipelineBaseInterface {
   name: string;
   desc?: string;
-  stages: string[];
-  deals: string[];
-  assignees: string[];
-  owner: string;
+  stages: string[] | (StageBaseInterface & BaseModel)[];
+  deals: string[] | (DealBaseInterface & BaseModel)[];
+  assignees: string[] | (UserBaseInterface & BaseModel)[];
+  owner: string | (UserBaseInterface & BaseModel);
 }
 
 export const pipelineCreateSchema = z.object({
@@ -45,7 +49,7 @@ export const pipelineAssignUserSchema = z.object({
 
 export const pipelineChangeOwnershipSchema = z.object({
   body: z.object({
-    newAssigneeId: z.string({
+    newOwnerId: z.string({
       required_error: "New Owner ID is required",
     }),
   }),

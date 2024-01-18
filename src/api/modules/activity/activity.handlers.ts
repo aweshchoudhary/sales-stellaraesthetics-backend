@@ -1,22 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
+import { activityCreateSchema } from "./activity.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const activity = await prisma.activity.create({ data: req.body });
-
-    await prisma.deal.updateMany({
-      where: { id: { in: activity.deals } },
-      data: { activities: { push: activity.id } },
-    });
-    await prisma.contact.updateMany({
-      where: { id: { in: activity.contacts } },
-      data: { activities: { push: activity.id } },
-    });
-
+    const validRequest = activityCreateSchema.parse(req);
+    const { files, ...validFields } = validRequest.body;
+    await prisma.activity.create({ data: validFields });
     res.status(200).json({ message: "Activity created successfully" });
   } catch (error) {
     next(error); // Handle errors

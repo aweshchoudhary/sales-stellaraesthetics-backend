@@ -1,12 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
+import { userCreateSchema, userPublicUpdateSchema } from "./user.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const user = await prisma.user.create({ data: req.body });
+    const validRequest = userCreateSchema.parse(req);
+    const { created, ...validFields } = validRequest.body;
+    const user = await prisma.user.create({
+      data: {
+        ...validFields,
+        roles: "USER",
+      },
+    });
     res.status(200).json({ message: "user created successfully", data: user });
   } catch (error) {
     next(error); // Handle errors
@@ -50,6 +58,28 @@ export async function getOne(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function updatePublicInfoOne(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const validRequest = userPublicUpdateSchema.parse(req);
+
+    const user = await prisma.user.update({
+      where: {
+        id: req.params.id,
+      },
+      data: validRequest.body,
+    });
+
+    res.status(200).json({
+      data: user,
+    });
+  } catch (error) {
+    next(error); // Handle errors
+  }
+}
 export async function updateOne(
   req: Request,
   res: Response,

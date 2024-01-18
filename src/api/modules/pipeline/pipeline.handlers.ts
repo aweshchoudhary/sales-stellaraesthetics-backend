@@ -2,27 +2,28 @@ import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
 import { deletePipeline } from "../../helper/delete.helper";
+import { getLoggedUserDetials } from "../../common/common.middlewares";
+import {
+  pipelineAssignUserSchema,
+  pipelineChangeOwnershipSchema,
+} from "./pipeline.util";
+import { isUserExistWithId } from "../user/user.controllers";
+import { isPipelineExistWithId } from "./pipeline.controllers";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const loggedUser: any = req.user;
-    const user = await prisma.user.findFirst({
-      where: {
-        firebaseUID: loggedUser.uid ?? "",
-      },
-    });
+    const loggedUser = await getLoggedUserDetials(req, next);
     // Your logic for creating a resource on the server goes here
-    console.log(user);
-
-    user &&
-      (await prisma.pipeline.create({
+    if (loggedUser) {
+      await prisma.pipeline.create({
         data: {
           ...req.body,
-          owner: { connect: { id: user.id } },
+          owner: { connect: { id: loggedUser?.id } },
         },
-      }));
+      });
+    }
 
     res.status(200).json({ message: "Pipeline created successfully" });
   } catch (error) {
@@ -116,31 +117,26 @@ export async function assignUserToPipeline(
   next: NextFunction
 ) {
   try {
-    const newAssigneeId: string = req.body?.newAssigneeId;
+    const validRequest = pipelineAssignUserSchema.parse(req);
 
-    // Your logic for deleting a resource from the server goes here
-    const isAssigneeExist = await prisma.pipeline.count({
-      where: {
-        assignees: {
-          has: newAssigneeId,
+    const isAssigneeAlreadyExistOnPipeline =
+      await prisma.assigneesOnPipelines.count({
+        where: {
+          pipelineId: req.params.pipelineId,
+          assigneeId: validRequest.body.newAssigneeId,
         },
-      },
-    });
+      });
 
-    if (isAssigneeExist === 1) {
+    if (isAssigneeAlreadyExistOnPipeline > 0) {
       return res
         .status(400)
         .json({ message: "Assignee already assigned to this pipeline" });
     }
 
-    await prisma.pipeline.update({
-      where: {
-        id: req.params.pipelineId,
-      },
+    await prisma.assigneesOnPipelines.create({
       data: {
-        assignees: {
-          push: newAssigneeId,
-        },
+        pipelineId: req.params.pipelineId,
+        assigneeId: validRequest.body.newAssigneeId,
       },
     });
 
@@ -158,25 +154,25 @@ export async function removeUserFromPipeline(
   next: NextFunction
 ) {
   try {
-    const assigneeId: string = req.body?.assigneeId;
+    const validRequest = pipelineAssignUserSchema.parse(req);
 
-    const pipeline = await prisma.pipeline.findUnique({
-      where: {
-        id: req.params.pipelineId,
-      },
-    });
-    // Your logic for deleting a resource from the server goes here
-    const filteredAssignees = pipeline?.assignees.filter(
-      (e) => e !== assigneeId
+    const isPipelineExist = await isPipelineExistWithId(req.params.id);
+    const isUserExist = await isUserExistWithId(
+      validRequest.body.newAssigneeId
     );
 
-    await prisma.pipeline.update({
+    if (!isPipelineExist) {
+      return res.status(400).json({ message: "Pipeline does not exist" });
+    }
+    if (!isUserExist) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+
+    await prisma.assigneesOnPipelines.delete({
       where: {
-        id: req.params.pipelineId,
-      },
-      data: {
-        assignees: {
-          set: filteredAssignees,
+        pipelineId_assigneeId: {
+          pipelineId: req.params.pipelineId,
+          assigneeId: validRequest.body.newAssigneeId,
         },
       },
     });
@@ -185,7 +181,7 @@ export async function removeUserFromPipeline(
       message: "User removed from this pipeline",
     });
   } catch (error) {
-    next(error); // Handle errors
+    next(error);
   }
 }
 
@@ -195,7 +191,18 @@ export async function changeOwnershipOfPipeline(
   next: NextFunction
 ) {
   try {
-    const newOwnerId: string = req.body?.newOwnerId;
+    const validRequest = pipelineChangeOwnershipSchema.parse(req);
+
+    const isPipelineExist = await isPipelineExistWithId(req.params.id);
+    const isUserExist = await isUserExistWithId(validRequest.body.newOwnerId);
+
+    if (!isUserExist) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+
+    if (!isPipelineExist) {
+      return res.status(400).json({ message: "Pipeline does not exist" });
+    }
 
     await prisma.pipeline.update({
       where: {
@@ -204,7 +211,7 @@ export async function changeOwnershipOfPipeline(
       data: {
         owner: {
           connect: {
-            id: newOwnerId,
+            id: validRequest.body.newOwnerId,
           },
         },
       },

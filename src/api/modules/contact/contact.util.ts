@@ -8,7 +8,7 @@ export interface ContactBaseInterface {
   email: string;
 }
 
-export const activityCreateSchema = z.object({
+export const contactCreateSchema = z.object({
   body: z.object({
     fullname: z.string({
       required_error: "Contact Name is required",
@@ -28,7 +28,7 @@ export const activityCreateSchema = z.object({
   }),
 });
 
-export const activityUpdateSchema = z.object({
+export const contactUpdateSchema = z.object({
   body: z.object({
     fullname: z.string().optional(),
     companyName: z.string().optional(),

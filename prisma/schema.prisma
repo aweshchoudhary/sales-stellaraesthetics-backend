@@ -11,29 +11,65 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id                  String                       @id @default(uuid())
+  name                String
+  email               String
+  mobile              String
+  userId              String
+  apiKey              String?
+  roles               ROLES                        @default(USER)
+  notifications       NotificationsOnUsers[]
+  notificationsOpened NotificationsOpenByOnUsers[]
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  created             UserCreated?
+}
+
+model Notification {
+  id        String                       @id @default(uuid())
   name      String
-  email     String
-  mobile    String
-  userId    String
-  roles     ROLES    @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content   String?
+  sentTo    NotificationsOnUsers[]
+  openBy    NotificationsOpenByOnUsers[]
+  createdAt DateTime                     @default(now())
+  updatedAt DateTime                     @updatedAt
+}
+
+model NotificationsOnUsers {
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  notificationId String
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  assignedAt     DateTime     @default(now())
+
+  @@id([notificationId, userId])
+}
+
+model NotificationsOpenByOnUsers {
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  notificationId String
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  assignedAt     DateTime     @default(now())
+
+  @@id([notificationId, userId])
 }
 
 model UserCreated {
-  id                String     @id @default(uuid())
-  userId            String
+  id                String                 @id @default(uuid())
+  user              User                   @relation(fields: [userId], references: [id])
+  userId            String                 @unique
   files             File[]
   notes             Note[]
   deals             Deal[]
   contacts          Contact[]
   stages            Stage[]
   pipelines         Pipeline[]
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  activitiesPerform Activity[] @relation("performedBy")
-  activitiesCreated Activity[] @relation("createdBy")
+  assignedPipelines AssigneesOnPipelines[]
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  activitiesPerform Activity[]             @relation("performedBy")
+  activitiesCreated Activity[]             @relation("createdBy")
   Label             Label[]
 }
 
@@ -65,41 +101,21 @@ model Note {
 }
 
 model File {
-  id         String       @id @default(uuid())
+  id         String      @id @default(uuid())
   name       String
   desc       String?
   size       BigInt
   type       String
   url        String
-  deal       Deal         @relation(fields: [dealId], references: [id])
+  deal       Deal        @relation(fields: [dealId], references: [id])
   dealId     String
-  contact    Contact      @relation(fields: [contactId], references: [id])
+  contact    Contact     @relation(fields: [contactId], references: [id])
   contactId  String
-  uploader   UserCreated? @relation(fields: [uploaderId], references: [id])
-  uploaderId String?
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  Activity   Activity?    @relation(fields: [activityId], references: [id])
-  activityId String?
+  uploader   UserCreated @relation(fields: [uploaderId], references: [id])
+  uploaderId String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
-
-// name: string;
-//   type: string;
-//   start: Date;
-//   end: Date;
-//   completed_on: Date | null;
-
-//   desc?: string;
-//   location?: string;
-//   taskLink?: string;
-//   googleEventId?: string;
-//   googleEventHtmlLink?: string;
-
-//   files: ActivityFiles[];
-//   performer: string | (UserBaseInterface & BaseModel);
-//   creator: string | (UserBaseInterface & BaseModel);
-//   dealId: string | (DealBaseInterface & BaseModel);
-//   contacts: string | (UserBaseInterface & BaseModel)[];
 
 model Activity {
   id                  String         @id @default(uuid())
@@ -117,11 +133,10 @@ model Activity {
   performerId         String?
   creator             UserCreated?   @relation("createdBy", fields: [creatorId], references: [id])
   creatorId           String?
-  files               File[]
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
-  ActivityFiles       ActivityFile[]
-  Deal                Deal           @relation(fields: [dealId], references: [id])
+  files               ActivityFile[]
+  deal                Deal           @relation(fields: [dealId], references: [id])
   dealId              String
   contact             Contact        @relation(fields: [contactId], references: [id])
   contactId           String
@@ -140,12 +155,6 @@ model ActivityFile {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
-
-// fullname: string;
-//   companyName?: string;
-//   mobile: string;
-//   whatsapp: string;
-//   email: string;
 
 model Contact {
   id          String       @id @default(uuid())
@@ -166,11 +175,11 @@ model Contact {
 
 model Deal {
   id                  String       @id @default(uuid())
-  name                String
+  name                String?
   desc                String?
   currency            String       @default("INR")
   value               Int          @default(0)
-  status              STATUS       @default(OPEN)
+  status              String       @default("open")
   expectedClosingDate DateTime     @default(now())
   labelId             String?
   label               Label?       @relation(fields: [labelId], references: [id])
@@ -178,7 +187,6 @@ model Deal {
   currentStageId      String
   contact             Contact      @relation(fields: [contactId], references: [id])
   contactId           String
-  items               String[] // Assuming Item is another model
   notes               Note[]
   files               File[]
   activities          Activity[]
@@ -186,36 +194,47 @@ model Deal {
   pipeline            Pipeline     @relation(fields: [pipelineId], references: [id])
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
-  userCreatedId       String?
-  UserCreated         UserCreated? @relation(fields: [userCreatedId], references: [id])
+  creatorId           String?
+  creator             UserCreated? @relation(fields: [creatorId], references: [id])
+  // items               String[] // Assuming Item is another model
 }
 
 model Stage {
-  id            String       @id @default(uuid())
-  name          String
-  desc          String?
-  position      Int          @default(1)
-  pipelineId    String
-  pipeline      Pipeline     @relation(fields: [pipelineId], references: [id])
-  deals         Deal[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  userCreatedId String?
-  UserCreated   UserCreated? @relation(fields: [userCreatedId], references: [id])
+  id         String       @id @default(uuid())
+  name       String
+  desc       String?
+  position   Int          @default(1)
+  pipelineId String
+  pipeline   Pipeline     @relation(fields: [pipelineId], references: [id])
+  deals      Deal[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  creatorId  String?
+  creator    UserCreated? @relation(fields: [creatorId], references: [id])
 }
 
 model Pipeline {
-  id        String      @id @default(uuid())
+  id        String                 @id @default(uuid())
   name      String
   desc      String?
   stages    Stage[]
   deals     Deal[]
-  // assignees     UserCreated[]
-  owner     UserCreated @relation(fields: [ownerId], references: [id])
+  assignees AssigneesOnPipelines[]
+  owner     UserCreated            @relation(fields: [ownerId], references: [id])
   ownerId   String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
   Label     Label[]
+}
+
+model AssigneesOnPipelines {
+  pipeline   Pipeline    @relation(fields: [pipelineId], references: [id])
+  pipelineId String
+  asignees   UserCreated @relation(fields: [assigneeId], references: [id])
+  assigneeId String
+  assignedAt DateTime    @default(now())
+
+  @@id([pipelineId, assigneeId])
 }
 
 enum ROLES {

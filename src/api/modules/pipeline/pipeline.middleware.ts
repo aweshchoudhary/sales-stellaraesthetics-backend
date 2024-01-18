@@ -13,7 +13,7 @@ export async function checkPipelineOwnerAccess(
     where: {
       id: req.params.pipelineId ?? req.body.pipelineId,
       owner: {
-        firebaseUID: loggedUser.uid,
+        userId: loggedUser.uid,
       },
     },
   });
@@ -32,10 +32,11 @@ export async function checkPipelineAssigneeAccess(
   next: NextFunction
 ) {
   const loggedUser: any = req.user;
-  const pipeline = await prisma.pipeline.count({
+
+  const pipeline = await prisma.assigneesOnPipelines.count({
     where: {
-      id: req.params.pipelineId ?? req.body.pipelineId,
-      assignees: { has: loggedUser.uid },
+      pipelineId: req.params.pipelineId ?? req.body.pipelineId,
+      assigneeId: loggedUser.uid,
     },
   });
 
@@ -54,21 +55,22 @@ export async function checkPipelineAccess(
   next: NextFunction
 ) {
   const loggedUser: any = req.user;
-  const pipeline = await prisma.pipeline.count({
+
+  const isPipelineWithOwnerId = await prisma.pipeline.count({
     where: {
       id: req.params.pipelineId ?? req.body.pipelineId,
-      OR: [
-        {
-          owner: {
-            firebaseUID: loggedUser.uid,
-          },
-        },
-        { assignees: { has: loggedUser.uid } },
-      ],
+      ownerId: loggedUser.uid,
     },
   });
 
-  if (pipeline === 0) {
+  const isPipelineWithAssigneeId = await prisma.assigneesOnPipelines.count({
+    where: {
+      pipelineId: req.params.pipelineId ?? req.body.pipelineId,
+      assigneeId: loggedUser.uid,
+    },
+  });
+
+  if (isPipelineWithAssigneeId === 0 && isPipelineWithOwnerId === 0) {
     return res
       .status(401)
       .json({ message: "You don't have access to this pipeline" });

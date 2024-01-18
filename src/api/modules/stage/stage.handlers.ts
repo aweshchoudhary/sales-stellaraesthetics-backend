@@ -2,12 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
 import { deleteDeals } from "../../helper/delete.helper";
+import { stageCreateSchema, stageUpdateSchema } from "./stage.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const { position, pipelineId }: any = req.body;
+    const validRequest = stageCreateSchema.parse(req);
+    const { position, pipelineId } = validRequest.body;
 
     const stages = await prisma.stage.findMany({
       where: {
@@ -15,22 +17,25 @@ export async function create(req: Request, res: Response, next: NextFunction) {
       },
     });
 
-    stages.forEach(async (item) => {
-      if (item.position >= position) {
-        await prisma.stage.update({
-          where: {
-            id: item.id,
-          },
-          data: {
-            position: item.position + 1,
-          },
-        });
-      }
-    });
+    if (position && position > 0) {
+      stages.forEach(async (item) => {
+        if (item.position >= position) {
+          await prisma.stage.update({
+            where: {
+              id: item.id,
+            },
+            data: {
+              position: item.position + 1,
+            },
+          });
+        }
+      });
+    }
 
+    const { deals, ...validFields } = validRequest.body;
     // Your logic for creating a resource on the server goes here
     await prisma.stage.create({
-      data: req.body,
+      data: validFields,
     });
 
     res.status(200).json({ message: "Stage created successfully" });
@@ -82,18 +87,31 @@ export async function updateOne(
   next: NextFunction
 ) {
   try {
-    if (req.body.id) {
-      return res
-        .status(400)
-        .json({ message: "You cannot change the id of this stage" });
+    const validRequest = stageUpdateSchema.parse(req);
+    const { deals, ...updateData } = validRequest.body;
+
+    if (deals?.length) {
+      deals.map(async (dealId) => {
+        await prisma.stage.update({
+          where: {
+            id: req.params.id,
+          },
+          data: {
+            deals: {
+              connect: {
+                id: dealId,
+              },
+            },
+          },
+        });
+      });
     }
 
-    // Your logic for updating a resource on the server goes here
     const stage = await prisma.stage.update({
       where: {
         id: req.params.id,
       },
-      data: req.body,
+      data: updateData,
     });
 
     res.status(200).json({
@@ -110,12 +128,22 @@ export async function deleteOne(
   next: NextFunction
 ) {
   try {
-    const { position, pipelineId }: any = req.body;
+    const stage = await prisma.stage.findUnique({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!stage) {
+      res.status(400).json({
+        message: "Stage not found",
+      });
+    }
 
     const stagesToUpdate = await prisma.stage.findMany({
       where: {
-        pipelineId,
-        position: { gt: position },
+        pipelineId: stage?.pipelineId,
+        position: { gt: stage?.position },
       },
     });
 
@@ -132,11 +160,10 @@ export async function deleteOne(
 
     await deleteDeals(req.params.id);
 
-    // Your logic for deleting a resource from the server goes here
     await prisma.stage.delete({
       where: {
         id: req.params.id,
-        position,
+        position: stage?.position,
       },
     });
 

@@ -17,15 +17,15 @@ export interface ActivityBaseInterface {
   googleEventHtmlLink?: string;
 
   files: ActivityFiles[];
-  performer: string | (UserBaseInterface & BaseModel);
-  creator: string | (UserBaseInterface & BaseModel);
+  performerId: string | (UserBaseInterface & BaseModel);
+  creatorId: string | (UserBaseInterface & BaseModel);
   dealId: string | (DealBaseInterface & BaseModel);
   contactId: string | (UserBaseInterface & BaseModel);
 }
 
 export interface ActivityFiles {
   activityId: string | (ActivityBaseInterface & BaseModel);
-  desc: string;
+  desc?: string;
   name: string;
   path: string;
   url: string;
@@ -53,41 +53,44 @@ export const activityCreateSchema = z.object({
       .string()
       .url({ message: "Not a valid Activity Task Url" })
       .optional(),
-    performer: z.string({
+    performerId: z.string({
       required_error: "Activity Performer is required",
     }),
-    creator: z.string({
+    creatorId: z.string({
       required_error: "Activity Creator is required",
     }),
-    deals: z.array(z.string()).nullable(),
-    contacts: z.array(z.string()).nullable(),
-    completed_on: z.date().nullable(),
-    googleEventId: z.string().nullable(),
-    googleEventHtmlLink: z.string().nullable(),
+    completed_on: z.date().optional(),
+    googleEventId: z.string().optional(),
+    googleEventHtmlLink: z.string().optional(),
     files: z
       .array(
-        z
-          .object({
-            desc: z.string().optional(),
-            name: z.string({
-              required_error: "Activity File Name is required",
-            }),
-            path: z.string({
-              required_error: "Activity File Path is required",
-            }),
-            url: z.string({
-              required_error: "Activity File Url is required",
-            }),
-            type: z.string({
-              required_error: "Activity File Type is required",
-            }),
-            size: z.number({
-              required_error: "Activity File Size is required",
-            }),
-          })
-          .nullable()
+        z.object({
+          desc: z.string().optional(),
+          name: z.string({
+            required_error: "Activity File Name is required",
+          }),
+          path: z.string({
+            required_error: "Activity File Path is required",
+          }),
+          url: z.string({
+            required_error: "Activity File Url is required",
+          }),
+          type: z.string({
+            required_error: "Activity File Type is required",
+          }),
+          size: z.number({
+            required_error: "Activity File Size is required",
+          }),
+        })
       )
       .optional(),
+
+    dealId: z.string({
+      required_error: "Deal ID is required",
+    }),
+    contactId: z.string({
+      required_error: "Contact ID is required",
+    }),
   }),
 });
 
@@ -103,35 +106,33 @@ export const activityUpdateSchema = z.object({
       .string()
       .url({ message: "Not a valid Activity Task Url" })
       .optional(),
-    performer: z.string().optional(),
-    creator: z.string().optional(),
-    deals: z.array(z.string()).nullable().optional(),
-    contacts: z.array(z.string()).nullable().optional(),
-    completed_on: z.date().nullable().optional(),
-    googleEventId: z.string().nullable().optional(),
-    googleEventHtmlLink: z.string().nullable().optional(),
+    performerId: z.string().optional(),
+    creatorId: z.string().optional(),
+    completed_on: z.date().optional(),
+    googleEventId: z.string().optional(),
+    googleEventHtmlLink: z.string().optional(),
+    dealId: z.string().optional(),
+    contactId: z.string().optional(),
     files: z
       .array(
-        z
-          .object({
-            desc: z.string().optional(),
-            name: z.string({
-              required_error: "Activity File Name is required",
-            }),
-            path: z.string({
-              required_error: "Activity File Path is required",
-            }),
-            url: z.string({
-              required_error: "Activity File Url is required",
-            }),
-            type: z.string({
-              required_error: "Activity File Type is required",
-            }),
-            size: z.number({
-              required_error: "Activity File Size is required",
-            }),
-          })
-          .nullable()
+        z.object({
+          desc: z.string().optional(),
+          name: z.string({
+            required_error: "Activity File Name is required",
+          }),
+          path: z.string({
+            required_error: "Activity File Path is required",
+          }),
+          url: z.string({
+            required_error: "Activity File Url is required",
+          }),
+          type: z.string({
+            required_error: "Activity File Type is required",
+          }),
+          size: z.number({
+            required_error: "Activity File Size is required",
+          }),
+        })
       )
       .optional(),
   }),

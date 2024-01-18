@@ -8,7 +8,7 @@ export interface LabelBaseInterface {
   creatorId: string;
 }
 
-export const fileCreateSchema = z.object({
+export const labelCreateSchema = z.object({
   body: z.object({
     label: z.string({
       required_error: "Label Name is required",
@@ -26,7 +26,7 @@ export const fileCreateSchema = z.object({
   }),
 });
 
-export const fileUpdateSchema = z.object({
+export const labelUpdateSchema = z.object({
   body: z.object({
     label: z.string().optional(),
     desc: z.string().optional(),

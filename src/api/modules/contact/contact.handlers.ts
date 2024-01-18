@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
+import { contactCreateSchema } from "./contact.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
+    const validRequest = contactCreateSchema.parse(req);
     const contact = await prisma.contact.create({
-      data: req.body,
+      data: validRequest.body,
     });
     res
       .status(200)

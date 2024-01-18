@@ -3,19 +3,31 @@ import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
 import path from "path";
 import fs from "fs";
+import { fileCreateSchema, fileUploadSchema } from "./file.util";
+import { z } from "zod";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const { filename, mimetype, path, size }: any = req.file;
+    const validFields: z.infer<typeof fileUploadSchema> = {
+      name: filename,
+      size,
+      type: mimetype,
+      url: path,
+    };
+
+    const validRequest = fileCreateSchema.parse(req);
+    const validUpload = fileUploadSchema.parse(validFields);
+
     const file = await prisma.file.create({
       data: {
-        name: filename,
-        type: mimetype,
-        url: path,
-        size,
-        ...req.body,
+        name: validUpload.name,
+        type: validUpload.type,
+        url: validUpload.url,
+        size: validUpload.size,
+        ...validRequest.body,
       },
     });
 

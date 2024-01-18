@@ -21,8 +21,8 @@ export interface UserBaseInterface {
   mobile: string;
   userId: string;
   roles: string;
-  apiKey: string;
-  created: {
+  apiKey: string | null;
+  created?: {
     activities: activityModel[];
     notes: noteModel[];
     files: fileModel[];
@@ -38,21 +38,29 @@ export const userCreateSchema = z.object({
     name: z.string({
       required_error: "User Full Name is required",
     }),
+    email: z
+      .string({
+        required_error: "User email is required",
+      })
+      .email({ message: "Not A valid User email" }),
+    mobile: z.string({
+      required_error: "User Mobile Number is required",
+    }),
     userId: z.string({
       required_error: "User ID is required",
     }),
-    roles: z.string({
-      required_error: "User Roles is required",
-    }),
-    created: z.object({
-      activities: z.array(z.string()).nullable().optional(),
-      notes: z.array(z.string()).nullable().optional(),
-      files: z.array(z.string()).nullable().optional(),
-      contacts: z.array(z.string()).nullable().optional(),
-      deals: z.array(z.string()).nullable().optional(),
-      pipelines: z.array(z.string()).nullable().optional(),
-      performers: z.array(z.string()).nullable().optional(),
-    }),
+    roles: z.string().optional(),
+    created: z
+      .object({
+        activities: z.array(z.string()).nullable().optional(),
+        notes: z.array(z.string()).nullable().optional(),
+        files: z.array(z.string()).nullable().optional(),
+        contacts: z.array(z.string()).nullable().optional(),
+        deals: z.array(z.string()).nullable().optional(),
+        pipelines: z.array(z.string()).nullable().optional(),
+        performers: z.array(z.string()).nullable().optional(),
+      })
+      .optional(),
   }),
 });
 

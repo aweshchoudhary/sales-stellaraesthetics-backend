@@ -17,28 +17,30 @@ export interface FileBaseInterface {
 
 export const fileCreateSchema = z.object({
   body: z.object({
-    name: z.string({
-      required_error: "File Name is required",
-    }),
     desc: z.string().optional(),
-    size: z.number({
-      required_error: "File size is required",
-    }),
-    type: z.string({
-      required_error: "File type is required",
-    }),
-    url: z.string({
-      required_error: "File Path/Url is required",
-    }),
     dealId: z.string({
       required_error: "Deal Id is required",
     }),
     contactId: z.string({
       required_error: "Contact Id is required",
     }),
-    uploader: z.string({
+    uploaderId: z.string({
       required_error: "File uploader is required",
     }),
+  }),
+});
+export const fileUploadSchema = z.object({
+  name: z.string({
+    required_error: "File Name is required",
+  }),
+  size: z.number({
+    required_error: "File size is required",
+  }),
+  type: z.string({
+    required_error: "File type is required",
+  }),
+  url: z.string({
+    required_error: "File Path/Url is required",
   }),
 });
 
@@ -51,6 +53,6 @@ export const fileUpdateSchema = z.object({
     url: z.string().optional(),
     dealId: z.string().optional(),
     contactId: z.string().optional(),
-    uploader: z.string().optional(),
+    uploaderId: z.string().optional(),
   }),
 });

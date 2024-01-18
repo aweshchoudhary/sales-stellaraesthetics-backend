@@ -54,12 +54,12 @@ export async function deleteDeals(stageId: string) {
 // }
 
 export async function deleteActivities(dealIds: string[]) {
-  await prisma.activity.deleteMany({
-    where: { deals: { hasSome: dealIds } },
-  });
+  // await prisma.activity.deleteMany({
+  //   where: { deals: { hasSome: dealIds } },
+  // });
 }
 export async function deleteNotes(dealIds: string[]) {
-  await prisma.note.deleteMany({
-    where: { deals: { hasSome: dealIds } },
-  });
+  // await prisma.note.deleteMany({
+  //   where: { deals: { hasSome: dealIds } },
+  // });
 }

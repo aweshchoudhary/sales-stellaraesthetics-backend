@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     await prisma.label.create({ data: req.body });
-
     res.status(200).json({ message: "Label created successfully" });
   } catch (error) {
     next(error); // Handle errors
