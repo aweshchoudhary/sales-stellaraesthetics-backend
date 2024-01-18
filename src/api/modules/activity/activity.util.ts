@@ -1,29 +1,30 @@
 import { z } from "zod";
+import { BaseModel } from "../../common/interfaces";
+import { UserBaseInterface } from "../user/user.util";
+import { DealBaseInterface } from "../deal/deal.util";
 
 export interface ActivityBaseInterface {
   name: string;
-  desc?: string;
   type: string;
   start: Date;
   end: Date;
-  location?: string;
-  taskUrl?: string;
-  performer: string;
-  creator: string;
-  deals: string[];
-  contacts: string[];
-  involved_contacts: string[];
-  involved_users: string[];
   completed_on: Date | null;
+
+  desc?: string;
+  location?: string;
+  taskLink?: string;
   googleEventId?: string;
   googleEventHtmlLink?: string;
+
   files: ActivityFiles[];
+  performer: string | (UserBaseInterface & BaseModel);
+  creator: string | (UserBaseInterface & BaseModel);
+  dealId: string | (DealBaseInterface & BaseModel);
+  contactId: string | (UserBaseInterface & BaseModel);
 }
-//   deals: DealInterface[];
-//   contacts: ContactInterface[];
-//   involved_contacts: ContactInterface[];
 
 export interface ActivityFiles {
+  activityId: string | (ActivityBaseInterface & BaseModel);
   desc: string;
   name: string;
   path: string;
@@ -48,7 +49,7 @@ export const activityCreateSchema = z.object({
       required_error: "Activity Start Date Time is required",
     }),
     location: z.string().optional(),
-    taskUrl: z
+    taskLink: z
       .string()
       .url({ message: "Not a valid Activity Task Url" })
       .optional(),
@@ -98,7 +99,7 @@ export const activityUpdateSchema = z.object({
     start: z.date().optional(),
     end: z.date().optional(),
     location: z.string().optional(),
-    taskUrl: z
+    taskLink: z
       .string()
       .url({ message: "Not a valid Activity Task Url" })
       .optional(),
