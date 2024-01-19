@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "roles" SET NOT NULL,
-ALTER COLUMN "roles" SET DEFAULT 'user',
-ALTER COLUMN "roles" SET DATA TYPE TEXT;

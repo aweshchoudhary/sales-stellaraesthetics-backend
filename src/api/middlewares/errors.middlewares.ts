@@ -6,7 +6,7 @@ export const errorGeneratorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const error: any = new Error("This is a simulated error");
+  const error: any = new Error("This endpoint is not available. Check Again");
   error.status = 500;
   next(error);
 };
@@ -21,7 +21,9 @@ export const errorResponseMiddleware = (
   // Set the status code of the response
   res.status(err.status || 500);
 
-  // console.log(err);
+  if (process.env.NODE_ENV === "development") {
+    console.log(err);
+  }
 
   // Send the error message in the response
   res.json({

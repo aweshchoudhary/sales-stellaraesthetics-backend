@@ -7,3 +7,5 @@ node_modules
 ./src/**/*.json
 src/api/utils/servicekey.json
 ./src/api/utils/servicekey.json
+
+./credentials.json

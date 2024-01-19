@@ -8,8 +8,10 @@ const prisma = new PrismaClient();
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const validRequest = noteCreateSchema.parse(req);
-
-    const note = await prisma.note.create({ data: validRequest.body });
+    const loggedUser: any = req.user;
+    const note = await prisma.note.create({
+      data: { ...validRequest.body, createdById: loggedUser.created.id },
+    });
 
     res.status(200).json({ message: "Note created successfully", data: note });
   } catch (error) {

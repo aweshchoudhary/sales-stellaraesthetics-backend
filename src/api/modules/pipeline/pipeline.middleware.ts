@@ -13,7 +13,7 @@ export async function checkPipelineOwnerAccess(
     where: {
       id: req.params.pipelineId ?? req.body.pipelineId,
       createdBy: {
-        id: loggedUser.id,
+        id: loggedUser.created.id,
       },
     },
   });
@@ -36,7 +36,7 @@ export async function checkPipelineAssigneeAccess(
   const pipeline = await prisma.assigneesOnPipelines.count({
     where: {
       pipelineId: req.params.pipelineId ?? req.body.pipelineId,
-      assigneeId: loggedUser.id,
+      assigneeId: loggedUser.created.id,
     },
   });
 
@@ -59,14 +59,14 @@ export async function checkPipelineAccess(
   const isPipelineWithOwnerId = await prisma.pipeline.count({
     where: {
       id: req.params.pipelineId ?? req.body.pipelineId,
-      createdById: loggedUser.id,
+      createdById: loggedUser.created.id,
     },
   });
 
   const isPipelineWithAssigneeId = await prisma.assigneesOnPipelines.count({
     where: {
       pipelineId: req.params.pipelineId ?? req.body.pipelineId,
-      assigneeId: loggedUser.id,
+      assigneeId: loggedUser.created.id,
     },
   });
 

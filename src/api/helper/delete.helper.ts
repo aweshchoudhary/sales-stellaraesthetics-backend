@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { unlink } from "fs";
 const prisma = new PrismaClient();
 
 export async function deletePipeline(pipelineId: string) {
@@ -35,7 +36,7 @@ export async function deleteDeals(stageId: string) {
   const dealIDsArr = deals.map((e) => e.id);
 
   const deleteTasks = [
-    // deleteFiles(deals),
+    deleteFiles(dealIDsArr),
     deleteActivities(dealIDsArr),
     deleteNotes(dealIDsArr),
   ];
@@ -44,22 +45,28 @@ export async function deleteDeals(stageId: string) {
   await prisma.deal.deleteMany({ where: { currentStageId: stageId } });
 }
 
-// export async function deleteFiles(deals) {
-//   const files = await FileModel.find({ dealId: { $in: deals } });
-//   files.forEach(async (file) => {
-//     fs.unlink("public/uploads/" + file.name, async () => {
-//       await file.deleteOne();
-//     });
-//   });
-// }
+export async function deleteFiles(dealIds: string[]) {
+  const files = await prisma.file.findMany({
+    where: { dealId: { in: dealIds } },
+  });
+  files.forEach(async (file) => {
+    unlink("public/uploads/" + file.name, async () => {
+      await prisma.file.delete({
+        where: {
+          id: file.id,
+        },
+      });
+    });
+  });
+}
 
 export async function deleteActivities(dealIds: string[]) {
-  // await prisma.activity.deleteMany({
-  //   where: { deals: { hasSome: dealIds } },
-  // });
+  await prisma.activity.deleteMany({
+    where: { dealId: { in: dealIds } },
+  });
 }
 export async function deleteNotes(dealIds: string[]) {
-  // await prisma.note.deleteMany({
-  //   where: { deals: { hasSome: dealIds } },
-  // });
+  await prisma.note.deleteMany({
+    where: { dealId: { in: dealIds } },
+  });
 }

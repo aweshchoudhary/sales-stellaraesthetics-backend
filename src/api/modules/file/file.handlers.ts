@@ -21,6 +21,8 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     const validRequest = fileCreateSchema.parse(req);
     const validUpload = fileUploadSchema.parse(validFields);
 
+    const loggedUser: any = req.user;
+
     const file = await prisma.file.create({
       data: {
         name: validUpload.name,
@@ -28,6 +30,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
         url: validUpload.url,
         size: validUpload.size,
         ...validRequest.body,
+        createdById: loggedUser.created.id,
       },
     });
 

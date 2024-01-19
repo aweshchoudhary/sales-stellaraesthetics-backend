@@ -19,12 +19,9 @@ export const pipelineCreateSchema = z.object({
       required_error: "Pipeline Name is required",
     }),
     desc: z.string().optional(),
-    stages: z.array(z.string()).nullable().optional(),
-    deals: z.array(z.string()).nullable().optional(),
-    assignees: z.array(z.string()).nullable().optional(),
-    createdById: z.string({
-      required_error: "Pipeline Owner is required",
-    }),
+    stages: z.array(z.string()).optional(),
+    deals: z.array(z.string()).optional(),
+    assignees: z.array(z.string()).optional(),
   }),
 });
 
@@ -32,9 +29,8 @@ export const pipelineUpdateSchema = z.object({
   body: z.object({
     name: z.string().optional(),
     desc: z.string().optional(),
-    stages: z.array(z.string()).nullable().optional(),
-    deals: z.array(z.string()).nullable().optional(),
-    assignees: z.array(z.string()).nullable().optional(),
+    stages: z.array(z.string()).optional(),
+    deals: z.array(z.string()).optional(),
   }),
 });
 

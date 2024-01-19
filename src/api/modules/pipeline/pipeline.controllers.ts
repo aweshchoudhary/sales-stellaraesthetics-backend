@@ -13,15 +13,19 @@ export async function getPipelineById(pipelineId: string) {
 }
 
 export async function isPipelineExistWithId(pipelineId: string) {
-  const pipeline = await prisma.pipeline.count({
-    where: {
-      id: pipelineId,
-    },
-  });
-  if (pipeline === 0) {
+  try {
+    const pipeline = await prisma.pipeline.findUnique({
+      where: {
+        id: pipelineId ?? "",
+      },
+    });
+    if (!pipeline) {
+      return false;
+    }
+    return true;
+  } catch (error) {
     return false;
   }
-  return true;
 }
 
 // export async function changePipelineOwnerWithId(pipelineId: string) {

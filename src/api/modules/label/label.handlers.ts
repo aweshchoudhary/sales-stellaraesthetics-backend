@@ -1,12 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
+import { labelCreateSchema } from "./label.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    await prisma.label.create({ data: req.body });
+    const validRequest = labelCreateSchema.parse(req);
+    const loggedUser: any = req.user;
+    await prisma.label.create({
+      data: { ...validRequest.body, createdById: loggedUser.created.id },
+    });
     res.status(200).json({ message: "Label created successfully" });
   } catch (error) {
     next(error); // Handle errors

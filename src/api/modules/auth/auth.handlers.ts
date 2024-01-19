@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { isUserExistWithId } from "../user/user.controllers";
 import { PrismaClient } from "@prisma/client";
-import { getLoggedUserDetials } from "../../common/common.middlewares";
 
 const prisma = new PrismaClient();
 
@@ -14,7 +13,7 @@ export async function generateAPIKey(
     const isUserExist = await isUserExistWithId(req.params.id);
     if (!isUserExist) res.status(404).json({ message: "User not found" });
 
-    const loggedUser = await getLoggedUserDetials(req, next);
+    const loggedUser: any = req.user;
 
     if (loggedUser?.id === req.params.id) {
       const apiKey = crypto.randomUUID();
@@ -22,6 +21,7 @@ export async function generateAPIKey(
         data: {
           key: apiKey,
           userId: req.params.id,
+          createdById: loggedUser.created.id,
         },
       });
       await prisma.user.update({
@@ -54,7 +54,7 @@ export async function deleteAPIKey(
     const isUserExist = await isUserExistWithId(req.params.id);
     if (!isUserExist) res.status(404).json({ message: "User not found" });
 
-    const loggedUser = await getLoggedUserDetials(req, next);
+    const loggedUser: any = req.user;
 
     if (loggedUser?.id === req.params.id) {
       await prisma.apiKey.delete({

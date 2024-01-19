@@ -85,9 +85,9 @@ model UserCreated {
   updatedAt         DateTime               @updatedAt
   activitiesPerform Activity[]             @relation("performedBy")
   activitiesCreated Activity[]             @relation("createdBy")
-  Label             Label[]
-  ActivityFile      ActivityFile[]
-  ApiKey            ApiKey[]
+  labels            Label[]
+  activityFiles     ActivityFile[]
+  apikeys           ApiKey[]
   createdById       String
 }
 

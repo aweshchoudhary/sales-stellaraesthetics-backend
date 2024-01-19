@@ -21,9 +21,6 @@ export const noteCreateSchema = z.object({
     contactId: z.string({
       required_error: "Contact ID is required",
     }),
-    createdById: z.string({
-      required_error: "Creator ID is required",
-    }),
   }),
 });
 
@@ -32,6 +29,5 @@ export const noteUpdateSchema = z.object({
     content: z.string().optional(),
     dealId: z.string().optional(),
     contactId: z.string().optional(),
-    createdById: z.string().optional(),
   }),
 });

@@ -9,7 +9,10 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const validRequest = activityCreateSchema.parse(req);
     const { files, ...validFields } = validRequest.body;
-    await prisma.activity.create({ data: validFields });
+    const loggedUser: any = req.user;
+    await prisma.activity.create({
+      data: { ...validFields, createdById: loggedUser.created.id },
+    });
     res.status(200).json({ message: "Activity created successfully" });
   } catch (error) {
     next(error);

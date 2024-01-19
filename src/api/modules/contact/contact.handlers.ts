@@ -8,8 +8,9 @@ const prisma = new PrismaClient();
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const validRequest = contactCreateSchema.parse(req);
+    const loggedUser: any = req.user;
     const contact = await prisma.contact.create({
-      data: validRequest.body,
+      data: { ...validRequest.body, createdById: loggedUser.created.id },
     });
     res
       .status(200)
@@ -91,7 +92,7 @@ export async function deleteOne(
   next: NextFunction
 ) {
   try {
-    await prisma.label.delete({ where: { id: req.params.id } });
+    await prisma.contact.delete({ where: { id: req.params.id } });
 
     res.status(200).json({
       message: "Contact Deleted Successfully",

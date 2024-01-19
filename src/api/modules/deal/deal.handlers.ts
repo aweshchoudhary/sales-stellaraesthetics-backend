@@ -2,13 +2,17 @@ import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import queryStringCheck from "../../utils/querystring.checker";
 import { deleteActivities, deleteDeals } from "../../helper/delete.helper";
+import { dealCreateSchema, dealUpdateSchema } from "./deal.util";
 
 const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
+    const validRequest = dealCreateSchema.parse(req);
+    const loggedUser: any = req.user;
+
     const stage = await prisma.stage.findUnique({
-      where: { id: req.body.currentStageId },
+      where: { id: validRequest.body.currentStageId },
     });
 
     if (!stage) {
@@ -17,7 +21,12 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 
     // Create a new deal and connect it to the current stage and pipeline
     const deal = await prisma.deal.create({
-      data: { ...req.body, pipelineId: stage.pipelineId },
+      data: {
+        ...validRequest.body,
+        currentStageId: stage.id,
+        pipelineId: stage.pipelineId,
+        createdById: loggedUser.created.id,
+      },
     });
 
     // Update the current stage to connect to the newly created deal
@@ -81,18 +90,40 @@ export async function updateOne(
   next: NextFunction
 ) {
   try {
-    if (req.body.id) {
-      return res
-        .status(400)
-        .json({ message: "You cannot change the id of this deal" });
+    const validRequest = dealUpdateSchema.parse(req);
+    const { notes, files, ...validFields } = validRequest.body;
+
+    if (files?.length) {
+      await prisma.deal.update({
+        where: {
+          id: req.params.id,
+        },
+        data: {
+          files: {
+            connect: files?.map((fileId: string) => ({ id: fileId })),
+          },
+        },
+      });
     }
 
+    if (notes?.length) {
+      await prisma.deal.update({
+        where: {
+          id: req.params.id,
+        },
+        data: {
+          files: {
+            connect: files?.map((fileId: string) => ({ id: fileId })),
+          },
+        },
+      });
+    }
     // Your logic for updating a resource on the server goes here
     const deal = await prisma.deal.update({
       where: {
         id: req.params.id,
       },
-      data: req.body,
+      data: validFields,
     });
 
     res.status(200).json({

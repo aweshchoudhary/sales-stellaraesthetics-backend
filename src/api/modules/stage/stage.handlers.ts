@@ -11,6 +11,8 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     const validRequest = stageCreateSchema.parse(req);
     const { position, pipelineId } = validRequest.body;
 
+    const loggedUser: any = req.user;
+
     const stages = await prisma.stage.findMany({
       where: {
         pipelineId,
@@ -35,7 +37,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     const { deals, ...validFields } = validRequest.body;
     // Your logic for creating a resource on the server goes here
     await prisma.stage.create({
-      data: validFields,
+      data: { ...validFields, createdById: loggedUser.created.id },
     });
 
     res.status(200).json({ message: "Stage created successfully" });

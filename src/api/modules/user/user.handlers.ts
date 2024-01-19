@@ -12,10 +12,12 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const validRequest = userCreateSchema.parse(req);
     const { created, ...validFields } = validRequest.body;
+    const loggedUser: any = req.user;
     const user = await prisma.user.create({
       data: {
         ...validFields,
-        roles: "USER",
+        roles: "user",
+        createdById: loggedUser.id,
       },
     });
     res.status(200).json({ message: "user created successfully", data: user });

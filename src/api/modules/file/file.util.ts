@@ -24,9 +24,6 @@ export const fileCreateSchema = z.object({
     contactId: z.string({
       required_error: "Contact Id is required",
     }),
-    createdById: z.string({
-      required_error: "File uploader is required",
-    }),
   }),
 });
 export const fileUploadSchema = z.object({

@@ -26,9 +26,6 @@ export const stageCreateSchema = z.object({
       required_error: "Pipeline ID is required",
     }),
     deals: z.array(z.string()).optional(),
-    createdById: z.string({
-      required_error: "Creator ID is required",
-    }),
   }),
 });
 

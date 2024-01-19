@@ -24,7 +24,12 @@ const app = Router();
 app.post("/", validate(pipelineCreateSchema), create);
 app.get("/", getMany);
 app.get("/:pipelineId", getOne);
-app.put("/:pipelineId", validate(pipelineUpdateSchema), updateOne);
+app.put(
+  "/:pipelineId",
+  validate(pipelineUpdateSchema),
+  checkPipelineOwnerAccess,
+  updateOne
+);
 app.delete("/:pipelineId", deleteOne);
 
 app.post(
@@ -40,7 +45,7 @@ app.post(
   removeUserFromPipeline
 );
 app.post(
-  "/change-ownership/:pipelinId",
+  "/change-ownership/:pipelineId",
   validate(pipelineChangeOwnershipSchema),
   checkPipelineOwnerAccess,
   changeOwnershipOfPipeline

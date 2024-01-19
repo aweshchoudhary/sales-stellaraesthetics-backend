@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { isUserExistWithId } from "../user/user.controllers";
 import { NextFunction } from "express";
 
 const prisma = new PrismaClient();
@@ -10,6 +9,13 @@ export async function getUserByApiKey(apiKey: string, next: NextFunction) {
       where: {
         apiKey: {
           key: apiKey,
+        },
+      },
+      include: {
+        created: {
+          select: {
+            id: true,
+          },
         },
       },
     });
