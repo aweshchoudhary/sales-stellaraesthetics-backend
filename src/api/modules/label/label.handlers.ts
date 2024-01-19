@@ -23,8 +23,8 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
     const config = queryStringCheck(req);
 
     // Your logic for retrieving many resources from the server goes here
-    const label = await prisma.label.findMany(config);
-    const count = await prisma.label.count(config);
+    const label = await prisma.label.findMany({ where: {}, ...config });
+    const count = await prisma.label.count({ where: {} });
 
     res.status(200).json({
       data: label,

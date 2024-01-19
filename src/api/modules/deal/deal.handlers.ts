@@ -52,8 +52,8 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
     const config = queryStringCheck(req);
 
     // Your logic for retrieving many resources from the server goes here
-    const deals = await prisma.deal.findMany(config);
-    const count = await prisma.deal.count({ where: config?.where });
+    const deals = await prisma.deal.findMany({ where: {}, ...config });
+    const count = await prisma.deal.count({ where: {} });
 
     res.status(200).json({
       data: deals,

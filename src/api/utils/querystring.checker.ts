@@ -2,7 +2,7 @@ import { Request } from "express";
 import { getManyReqFilters } from "../common/utils";
 
 function queryStringCheck(req: Request) {
-  const { sort, skip, limit, populate } = getManyReqFilters.parse(req.query);
+  const { sort, skip, limit, include } = getManyReqFilters.parse(req.query);
   const config: any = {};
 
   if (sort) {
@@ -18,7 +18,20 @@ function queryStringCheck(req: Request) {
 
   if (limit) config.take = Number(limit) ?? 10;
   if (skip) config.skip = Number(skip) ?? 0;
-  if (populate) config.include = JSON.parse(populate);
+
+  if (include) {
+    let configIncludes = {};
+    const fields: string[] = include.split(",");
+
+    fields.map((field: string) => {
+      configIncludes = {
+        ...configIncludes,
+        [field]: true,
+      };
+    });
+
+    config.include = configIncludes;
+  }
 
   return config;
 }

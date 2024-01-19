@@ -116,11 +116,21 @@ export const activityUpdateSchema = z.object({
       .array(
         z.object({
           desc: z.string().optional(),
-          name: z.string(),
-          path: z.string(),
-          url: z.string(),
-          type: z.string(),
-          size: z.number(),
+          name: z.string({
+            required_error: "Activity File Name is required",
+          }),
+          path: z.string({
+            required_error: "Activity File Path is required",
+          }),
+          url: z.string({
+            required_error: "Activity File Url is required",
+          }),
+          type: z.string({
+            required_error: "Activity File Type is required",
+          }),
+          size: z.number({
+            required_error: "Activity File Size is required",
+          }),
         })
       )
       .optional(),

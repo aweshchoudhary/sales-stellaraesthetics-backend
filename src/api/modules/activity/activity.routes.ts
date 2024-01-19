@@ -7,15 +7,13 @@ import {
   updateOne,
 } from "./activity.handlers";
 import { verifyActivityAccess } from "./activity.middlewares";
-import { activityCreateSchema, activityUpdateSchema } from "./activity.util";
-import validate from "../../common/validate.schema";
 
 const app = Router();
 
-app.post("/", validate(activityCreateSchema), create);
+app.post("/", create);
 app.get("/", getMany);
 app.get("/:id", getOne);
-app.put("/:id", validate(activityUpdateSchema), updateOne);
+app.put("/:id", updateOne);
 app.delete("/:id", verifyActivityAccess, deleteOne);
 
 export default app;

@@ -7,7 +7,18 @@ const prisma = new PrismaClient();
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const validRequest = activityCreateSchema.parse(req);
+    let { start, end } = req.body;
+    if (start && end) {
+      start = new Date(start);
+      end = new Date(end);
+    }
+    const validRequest = activityCreateSchema.parse({
+      body: {
+        ...req.body,
+        start,
+        end,
+      },
+    });
     const { files, ...validFields } = validRequest.body;
     const loggedUser: any = req.user;
     await prisma.activity.create({

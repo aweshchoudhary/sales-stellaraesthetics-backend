@@ -140,8 +140,8 @@ model Activity {
   name                String
   desc                String?
   type                String
-  start               DateTime
-  end                 DateTime
+  start               DateTime       @default(now())
+  end                 DateTime       @default(now())
   location            String?
   taskLink            String?
   googleEventId       String?

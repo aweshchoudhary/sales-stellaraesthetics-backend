@@ -7,7 +7,7 @@ export interface SortInterface {
 
 export interface GetManyFiltersInterface {
   sort: SortInterface[];
-  populate: string;
+  include: string;
   limit: number;
   skip: number;
 }
@@ -21,7 +21,7 @@ export const getManyReqFilters = z.object({
       })
     )
     .optional(),
-  populate: z.string().optional(),
+  include: z.string().optional(),
   limit: z.number().min(0).max(100).optional(),
   skip: z.number().optional(),
 });
