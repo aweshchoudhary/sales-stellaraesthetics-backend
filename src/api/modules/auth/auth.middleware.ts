@@ -80,6 +80,7 @@ export async function validateApiKey(
   const foundKey = await prisma.apiKey.findFirst({
     where: {
       key: apiKey,
+      status: "active",
     },
   });
 
