@@ -9,4 +9,5 @@ src/api/utils/servicekey.json
 ./src/api/utils/servicekey.json
 
 ./credentials.json
+credentials.json
 *.json
