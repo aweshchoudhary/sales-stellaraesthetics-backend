@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-export interface NotificationBaseInterface {
-  name: string;
-  content?: string;
-  sentTo: any;
-  openBy: any;
-}
-
 export const notificationCreateSchema = z.object({
   body: z.object({
     name: z.string().min(3).max(255),

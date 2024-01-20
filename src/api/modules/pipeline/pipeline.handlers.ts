@@ -53,6 +53,65 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function getPipelineTableDataByOwnerId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    let filteredPipelines: any = [];
+    let limit = parseInt(`${req.query?.limit}` ?? "10");
+    let skip = parseInt(`${req.query?.skip}` ?? "0");
+
+    const loggedUser: any = req.user;
+
+    const pipelinesByOwnerId = await prisma.pipeline.findMany({
+      where: {
+        createdById: loggedUser.created.id,
+      },
+      include: {
+        deals: true,
+      },
+      take: limit,
+      skip,
+    });
+
+    pipelinesByOwnerId.map((pipeline) => {
+      const { createdById, deals, ...publicFields } = pipeline;
+      let openDealsCount = 0;
+      let wonDealsCount = 0;
+      let lostDealsCount = 0;
+      let totalDealsCount = pipeline.deals.length ?? 0;
+
+      pipeline.deals.map((deal) => {
+        if (deal.status === "open") {
+          openDealsCount += 1;
+        }
+        if (deal.status === "won") {
+          wonDealsCount += 1;
+        }
+        if (deal.status === "lost") {
+          lostDealsCount += 1;
+        }
+      });
+
+      filteredPipelines.push({
+        ...publicFields,
+        openDealsCount,
+        wonDealsCount,
+        lostDealsCount,
+        totalDealsCount,
+      });
+    });
+
+    res
+      .status(200)
+      .json({ data: filteredPipelines, count: filteredPipelines?.length ?? 0 });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getManyByUserId(
   req: Request,
   res: Response,

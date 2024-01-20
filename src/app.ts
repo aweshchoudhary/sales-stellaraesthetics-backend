@@ -81,7 +81,6 @@ app.post("/auth", async (req, res) => {
 
 // Mount the API routes under /api/v1 path
 app.use("/api/v1", authenticate, api);
-// app.use("/api/v1", isAuthenticated, api);
 
 app.use(errorGeneratorMiddleware);
 app.use(errorResponseMiddleware);

@@ -4,6 +4,22 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+export async function getLoggedUserDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const loggedUser: any = req.user;
+    if (!loggedUser) res.status(404).json({ message: "User not found" });
+    res.status(200).json({ data: loggedUser });
+  } catch (error) {
+    next && next(error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function generateAPIKey(
   req: Request,
   res: Response,

@@ -1,37 +1,4 @@
 import { z } from "zod";
-import { BaseModel } from "../../common/interfaces";
-import { UserBaseInterface } from "../user/user.util";
-import { DealBaseInterface } from "../deal/deal.util";
-
-export interface ActivityBaseInterface {
-  name: string;
-  type: string;
-  start: Date;
-  end: Date;
-  completed_on: Date | null;
-
-  desc?: string;
-  location?: string;
-  taskLink?: string;
-  googleEventId?: string;
-  googleEventHtmlLink?: string;
-
-  files: ActivityFiles[];
-  performerId: string | (UserBaseInterface & BaseModel);
-  createdById: string | (UserBaseInterface & BaseModel);
-  dealId: string | (DealBaseInterface & BaseModel);
-  contactId: string | (UserBaseInterface & BaseModel);
-}
-
-export interface ActivityFiles {
-  activityId: string | (ActivityBaseInterface & BaseModel);
-  desc?: string;
-  name: string;
-  path: string;
-  url: string;
-  type: string;
-  size: number;
-}
 
 export const activityCreateSchema = z.object({
   body: z.object({

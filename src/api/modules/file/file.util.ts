@@ -1,19 +1,4 @@
 import { z } from "zod";
-import { DealBaseInterface } from "../deal/deal.util";
-import { BaseModel } from "../../common/interfaces";
-import { ContactBaseInterface } from "../contact/contact.util";
-import { UserBaseInterface } from "../user/user.util";
-
-export interface FileBaseInterface {
-  name: string;
-  desc?: string;
-  size: number;
-  type: string;
-  url: string;
-  dealId: string | (DealBaseInterface & BaseModel);
-  contactId: string | (ContactBaseInterface & BaseModel);
-  createdById: string | (UserBaseInterface & BaseModel);
-}
 
 export const fileCreateSchema = z.object({
   body: z.object({

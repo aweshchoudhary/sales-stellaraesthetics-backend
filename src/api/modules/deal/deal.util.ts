@@ -1,29 +1,4 @@
 import { z } from "zod";
-import { LabelBaseInterface } from "../label/label.util";
-import { BaseModel } from "../../common/interfaces";
-import { NoteBaseInterface } from "../note/note.util";
-import { ActivityBaseInterface } from "../activity/activity.util";
-import { UserBaseInterface } from "../user/user.util";
-import { FileBaseInterface } from "../file/file.util";
-import { ContactBaseInterface } from "../contact/contact.util";
-
-export interface DealBaseInterface {
-  name?: string;
-  desc?: string;
-  value: number;
-  currency: string;
-  currentStageId: string;
-  expectedClosingDate?: Date;
-  status: string;
-  pipelineId?: string;
-  contactId: string | (ContactBaseInterface & BaseModel);
-  labelId?: string | (LabelBaseInterface & BaseModel);
-  notes: string | (NoteBaseInterface & BaseModel)[];
-  activities: string | (ActivityBaseInterface & BaseModel)[];
-  files: string | (FileBaseInterface & BaseModel)[];
-  createdById: string | (UserBaseInterface & BaseModel);
-  // items: string;
-}
 
 export const dealCreateSchema = z.object({
   body: z.object({

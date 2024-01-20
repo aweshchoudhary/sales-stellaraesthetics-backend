@@ -8,9 +8,11 @@ import label from "./modules/label/label.routes";
 import file from "./modules/file/file.routes";
 import activity from "./modules/activity/activity.routes";
 import user from "./modules/user/user.routes";
+import auth from "./modules/auth/auth.routes";
 
 const app = Router();
 
+app.use("/auth", auth);
 app.use("/pipelines", pipeline);
 app.use("/stages", stage);
 app.use("/contacts", contact);

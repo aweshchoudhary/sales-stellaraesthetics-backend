@@ -6,6 +6,7 @@ import {
   deleteOne,
   getMany,
   getOne,
+  getPipelineTableDataByOwnerId,
   removeUserFromPipeline,
   updateOne,
 } from "./pipeline.handlers";
@@ -23,6 +24,7 @@ const app = Router();
 
 app.post("/", validate(pipelineCreateSchema), create);
 app.get("/", getMany);
+app.get("/my-pipelines", getPipelineTableDataByOwnerId);
 app.get("/:pipelineId", getOne);
 app.put(
   "/:pipelineId",

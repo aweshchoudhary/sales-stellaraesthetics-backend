@@ -1,13 +1,5 @@
 import { z } from "zod";
 
-export interface LabelBaseInterface {
-  label: string;
-  desc?: string;
-  color: string;
-  pipelineId: string;
-  createdById: string;
-}
-
 export const labelCreateSchema = z.object({
   body: z.object({
     label: z.string({

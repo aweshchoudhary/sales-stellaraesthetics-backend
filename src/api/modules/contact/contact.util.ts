@@ -1,14 +1,5 @@
 import { z } from "zod";
 
-export interface ContactBaseInterface {
-  fullname: string;
-  companyName?: string;
-  mobile: string;
-  whatsapp: string;
-  email: string;
-  createdById: string;
-}
-
 export const contactCreateSchema = z.object({
   body: z.object({
     fullname: z.string({

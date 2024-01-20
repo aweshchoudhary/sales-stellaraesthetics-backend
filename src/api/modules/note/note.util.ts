@@ -1,14 +1,4 @@
 import { z } from "zod";
-import { DealBaseInterface } from "../deal/deal.util";
-import { BaseModel } from "../../common/interfaces";
-import { ContactBaseInterface } from "../contact/contact.util";
-
-export interface NoteBaseInterface {
-  content: string;
-  dealId: string | (DealBaseInterface & BaseModel);
-  contactId: string | (ContactBaseInterface & BaseModel);
-  createdById: string;
-}
 
 export const noteCreateSchema = z.object({
   body: z.object({

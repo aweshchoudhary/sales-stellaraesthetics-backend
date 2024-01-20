@@ -1,40 +1,4 @@
 import { z } from "zod";
-import { BaseModel } from "../../common/interfaces";
-import { DealBaseInterface } from "../deal/deal.util";
-import { PipelineBaseInterface } from "../pipeline/pipeline.util";
-import { NoteBaseInterface } from "../note/note.util";
-import { FileBaseInterface } from "../file/file.util";
-import { ContactBaseInterface } from "../contact/contact.util";
-import { ActivityBaseInterface } from "../activity/activity.util";
-import { APIKeyBaseInterface } from "../auth/auth.utils";
-
-export interface noteModel extends BaseModel, NoteBaseInterface {}
-export interface activityModel extends BaseModel, ActivityBaseInterface {}
-export interface fileModel extends BaseModel, FileBaseInterface {}
-export interface contactModel extends BaseModel, ContactBaseInterface {}
-export interface activityModel extends BaseModel, ActivityBaseInterface {}
-export interface pipelineModel extends BaseModel, PipelineBaseInterface {}
-export interface dealModel extends BaseModel, DealBaseInterface {}
-
-export interface UserBaseInterface {
-  name: string;
-  email: string;
-  mobile: string;
-  userId: string;
-  roles: string;
-  apiKey?: string | (APIKeyBaseInterface & BaseModel);
-  created?: {
-    activities: activityModel[];
-    notes: noteModel[];
-    files: fileModel[];
-    contacts: contactModel[];
-    deals: dealModel[];
-    pipelines: pipelineModel[];
-    perform_activities: activityModel[];
-  };
-  createdBy?: string;
-}
-
 export const userCreateSchema = z.object({
   body: z.object({
     name: z.string({
