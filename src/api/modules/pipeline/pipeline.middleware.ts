@@ -20,7 +20,7 @@ export async function checkPipelineOwnerAccess(
 
   if (pipeline === 0) {
     return res
-      .status(401)
+      .status(400)
       .json({ message: "You don't have access to this pipeline" });
   }
 
@@ -42,7 +42,7 @@ export async function checkPipelineAssigneeAccess(
 
   if (pipeline === 0) {
     return res
-      .status(401)
+      .status(400)
       .json({ message: "You don't have access to this pipeline" });
   }
 
@@ -72,7 +72,7 @@ export async function checkPipelineAccess(
 
   if (isPipelineWithAssigneeId === 0 && isPipelineWithOwnerId === 0) {
     return res
-      .status(401)
+      .status(400)
       .json({ message: "You don't have access to this pipeline" });
   }
 

@@ -16,8 +16,8 @@ function queryStringCheck(req: Request) {
     });
   }
 
-  if (limit) config.take = Number(limit) ?? 10;
-  if (skip) config.skip = Number(skip) ?? 0;
+  if (limit) config.take = parseInt(`${req.query?.limit}`) ?? 10;
+  if (skip) config.skip = parseInt(`${req.query?.skip}`) ?? 0;
 
   if (include) {
     let configIncludes = {};

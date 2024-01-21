@@ -64,6 +64,40 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function getManyByStageId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const stageId = req.params.stageId;
+    const config = queryStringCheck(req);
+
+    // Your logic for retrieving many resources from the server goes here
+    const deals = await prisma.deal.findMany({
+      where: {
+        currentStageId: stageId,
+      },
+      include: {
+        label: true,
+      },
+      ...config,
+    });
+    const count = await prisma.deal.count({
+      where: {
+        currentStageId: stageId,
+      },
+    });
+
+    res.status(200).json({
+      data: deals,
+      count,
+    });
+  } catch (error) {
+    next(error); // Handle errors
+  }
+}
+
 export async function getOne(req: Request, res: Response, next: NextFunction) {
   try {
     const config = queryStringCheck(req);

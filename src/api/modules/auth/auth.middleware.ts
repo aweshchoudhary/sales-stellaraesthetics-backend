@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { getUserByApiKey } from "./auth.controllers";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import axios from "axios";
+import { AUTH_BASE_URL } from "../../config";
 
 const prisma = new PrismaClient();
 
@@ -104,7 +105,7 @@ async function authenticateWith(
   next: NextFunction
 ) {
   try {
-    const accessToken: string = req.headers.authorization?.split(" ")[1] || "";
+    const accessToken: string = req.headers.authorization || "";
     const apiKey: string = req.headers["api-key"]?.toString() || "";
 
     if (accessToken && apiKey) {
@@ -113,13 +114,12 @@ async function authenticateWith(
       });
       return;
     }
-
     if (accessToken) {
       const userByAccessToken = await axios.get(
-        `http://localhost:8000/api/v1/users/me` ?? "",
+        `${AUTH_BASE_URL}/users/me` ?? "",
         {
           headers: {
-            Authorization: "bearer " + accessToken,
+            Authorization: accessToken,
           },
         }
       );
@@ -149,7 +149,6 @@ async function authenticateWith(
       res.status(401).json({ message: "Authorization header missing" });
     }
   } catch (error) {
-    console.error("Authentication error:", error);
     res.status(401).json({ message: "Unauthorized" });
   }
 }

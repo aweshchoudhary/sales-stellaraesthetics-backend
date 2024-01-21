@@ -60,20 +60,21 @@ export async function getPipelineTableDataByOwnerId(
 ) {
   try {
     let filteredPipelines: any = [];
-    let limit = parseInt(`${req.query?.limit}` ?? "10");
-    let skip = parseInt(`${req.query?.skip}` ?? "0");
-
+    const config = queryStringCheck(req);
     const loggedUser: any = req.user;
 
     const pipelinesByOwnerId = await prisma.pipeline.findMany({
       where: {
         createdById: loggedUser.created.id,
       },
+      take: config.take,
+      skip: config.skip,
+      orderBy: {
+        updatedAt: "asc",
+      },
       include: {
         deals: true,
       },
-      take: limit,
-      skip,
     });
 
     pipelinesByOwnerId.map((pipeline) => {
@@ -103,7 +104,6 @@ export async function getPipelineTableDataByOwnerId(
         totalDealsCount,
       });
     });
-
     res
       .status(200)
       .json({ data: filteredPipelines, count: filteredPipelines?.length ?? 0 });

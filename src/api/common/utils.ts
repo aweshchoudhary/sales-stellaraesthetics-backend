@@ -22,6 +22,6 @@ export const getManyReqFilters = z.object({
     )
     .optional(),
   include: z.string().optional(),
-  limit: z.number().min(0).max(100).optional(),
-  skip: z.number().optional(),
+  limit: z.string().min(0).max(100).optional(),
+  skip: z.string().optional(),
 });
