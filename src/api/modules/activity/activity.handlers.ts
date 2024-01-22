@@ -47,6 +47,38 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function getManyDealId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const status = req.query.status;
+    const config = queryStringCheck(req);
+
+    // Your logic for retrieving many resources from the server goes here
+    const activities = await prisma.activity.findMany({
+      where: {
+        dealId: req.params.dealId,
+      },
+      ...config,
+    });
+
+    const count = await prisma.activity.count({
+      where: {
+        dealId: req.params.dealId,
+      },
+    });
+
+    res.status(200).json({
+      data: activities,
+      count,
+    });
+  } catch (error) {
+    next(error); // Handle errors
+  }
+}
+
 export async function getOne(req: Request, res: Response, next: NextFunction) {
   try {
     const config = queryStringCheck(req);

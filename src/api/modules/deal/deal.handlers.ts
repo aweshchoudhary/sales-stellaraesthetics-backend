@@ -23,6 +23,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     const deal = await prisma.deal.create({
       data: {
         ...validRequest.body,
+        status: "open",
         currentStageId: stage.id,
         pipelineId: stage.pipelineId,
         createdById: loggedUser.created.id,

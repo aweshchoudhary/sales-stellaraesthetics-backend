@@ -19,7 +19,7 @@ export const dealCreateSchema = z.object({
         required_error: "Stage Id is required",
       })
       .optional(),
-    expectedClosingDate: z.date().optional(),
+    expectedClosingDate: z.string().transform((str) => new Date(str)),
     status: z
       .string({
         required_error: "Deal Status is required",

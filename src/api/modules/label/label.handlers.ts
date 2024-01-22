@@ -9,10 +9,12 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const validRequest = labelCreateSchema.parse(req);
     const loggedUser: any = req.user;
-    await prisma.label.create({
+    const newLabel = await prisma.label.create({
       data: { ...validRequest.body, createdById: loggedUser.created.id },
     });
-    res.status(200).json({ message: "Label created successfully" });
+    res
+      .status(200)
+      .json({ message: "Label created successfully", data: newLabel });
   } catch (error) {
     next(error); // Handle errors
   }
@@ -28,6 +30,36 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
 
     res.status(200).json({
       data: label,
+      count,
+    });
+  } catch (error) {
+    next(error); // Handle errors
+  }
+}
+
+export async function getManyPipelineId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const config = queryStringCheck(req);
+
+    // Your logic for retrieving many resources from the server goes here
+    const labels = await prisma.label.findMany({
+      where: {
+        pipelineId: req.params.pipelineId,
+      },
+      ...config,
+    });
+    const count = await prisma.label.count({
+      where: {
+        pipelineId: req.params.pipelineId,
+      },
+    });
+
+    res.status(200).json({
+      data: labels,
       count,
     });
   } catch (error) {

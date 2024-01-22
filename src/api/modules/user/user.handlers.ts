@@ -43,6 +43,27 @@ export async function getMany(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function getManyByPipelinId(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const config = queryStringCheck(req);
+
+    // Your logic for retrieving many resources from the server goes here
+    const users = await prisma.user.findMany({ where: {}, ...config });
+    const count = await prisma.user.count({ where: {} });
+
+    res.status(200).json({
+      data: users,
+      count,
+    });
+  } catch (error) {
+    next(error); // Handle errors
+  }
+}
+
 export async function getOne(req: Request, res: Response, next: NextFunction) {
   try {
     const config = queryStringCheck(req);
@@ -85,6 +106,7 @@ export async function updatePublicInfoOne(
     next(error); // Handle errors
   }
 }
+
 export async function updateOne(
   req: Request,
   res: Response,
@@ -175,6 +197,7 @@ export async function generateAPIKey(
     await prisma.$disconnect();
   }
 }
+
 export async function deleteAPIKey(
   req: Request,
   res: Response,
